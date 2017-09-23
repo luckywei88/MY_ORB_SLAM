@@ -41,11 +41,14 @@
 #include "tf/transform_datatypes.h"
 #include <tf/transform_broadcaster.h>
 
-
-#include"System.h"
+#include "AllConfig.h"
+#include "System.h"
+#include "Converter.h"
 
 using namespace std;
-int i;
+int i,type;
+string bg,config,world,base,odom;
+bool enable_ros;
 ORB_SLAM2::Send *sendpc;
 
 class ImageGrabber
@@ -60,10 +63,11 @@ public:
 
 int main(int argc, char **argv)
 {
-	string bg,config,world,base,odom;
 	bool gui;
 	i=0;
+	type=0;
 	gui=true;
+	enable_ros=true;
 	ros::init(argc, argv, "RGBD");
 	ros::start();
 	ros::NodeHandle nh;
@@ -73,14 +77,10 @@ int main(int argc, char **argv)
 	{
 		ROS_ERROR("enter ros");
 		ros::NodeHandle n_private("~");
-		n_private.param("bag_of_word",bg,bg);
-		n_private.param("config",config,config);
-		n_private.param("world_tf",world,world);
-		n_private.param("base_tf",base,base);
-		n_private.param("odom_tf",odom,odom);
-		n_private.param("use_gui",gui,gui);
-		sendpc=new ORB_SLAM2::Send(world,base,odom);
-		SLAM = new ORB_SLAM2::System(bg,config,sendpc,ORB_SLAM2::System::RGBD,gui);
+		ORB_SLAM2::AllConfig* con=new ORB_SLAM2::AllConfig();
+		con->setCon(n_private);
+		sendpc=new ORB_SLAM2::Send(con->world,con->base,con->odom);
+		SLAM = new ORB_SLAM2::System(con,ORB_SLAM2::System::RGBD);
 	}   
 	else
 	{
@@ -92,10 +92,10 @@ int main(int argc, char **argv)
 	ImageGrabber igb(SLAM);
 
 
-	message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/rgb", 4);
-	message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/depth", 4);
+	message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/rgb", 10);
+	message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/depth", 10);
 	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
-	message_filters::Synchronizer<sync_pol> sync(sync_pol(4), rgb_sub,depth_sub);
+	message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
 	sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
 
 	ros::spin();
@@ -113,7 +113,8 @@ int main(int argc, char **argv)
 
 void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD)
 {
-	// Copy the ros image message to cv::Mat.
+	// Copy the ros image message to cv::Ma
+	static tf::TransformListener tf_listener;
 	cv_bridge::CvImageConstPtr cv_ptrRGB;
 	try
 	{
@@ -135,27 +136,33 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const senso
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
+	const ros::Time time=cv_ptrRGB->header.stamp;	
 	cv::Mat pose=mpSLAM->TrackRGBD(cv_ptrRGB->image,cv_ptrD->image,cv_ptrRGB->header.stamp.toSec());
-	if(!sendpc->getloop())
+	bool enable_ros=true;
+	if(enable_ros)
 	{
+	    if(!sendpc->getloop())
+	    {
 		if(pose.rows==4&&pose.cols==4)
 		{
-			cv::Mat Rwc(3,3,CV_32F);
-			cv::Mat twc(3,1,CV_32F);
-			Rwc = pose.rowRange(0,3).colRange(0,3).t();
-			twc = -Rwc*pose.rowRange(0,3).col(3);
-			float a[]={
-				Rwc.at<float>(0,0),Rwc.at<float>(0,1),Rwc.at<float>(0,2),twc.at<float>(0),
-				Rwc.at<float>(1,0),Rwc.at<float>(1,1),Rwc.at<float>(1,2),twc.at<float>(1),
-				Rwc.at<float>(2,0),Rwc.at<float>(2,1),Rwc.at<float>(2,2),twc.at<float>(2),
-				0,0,0,1
-			};
-			cv::Mat currentm(4,4,CV_32F,a);
-			sendpc->sendout(mpSLAM->getCurrentFrame().cloud,currentm,cv_ptrRGB->header.stamp);
+		    cv::Mat Rwc(3,3,CV_32F);
+		    cv::Mat twc(3,1,CV_32F);
+		    Rwc = pose.rowRange(0,3).colRange(0,3).t();
+		    twc = -Rwc*pose.rowRange(0,3).col(3);
+		    float a[]={
+			Rwc.at<float>(0,0),Rwc.at<float>(0,1),Rwc.at<float>(0,2),twc.at<float>(0),
+			Rwc.at<float>(1,0),Rwc.at<float>(1,1),Rwc.at<float>(1,2),twc.at<float>(1),
+			Rwc.at<float>(2,0),Rwc.at<float>(2,1),Rwc.at<float>(2,2),twc.at<float>(2),
+			0,0,0,1
+		    };
+		    cv::Mat currentm(4,4,CV_32F,a);
+		    cv::Mat finalm=ORB_SLAM2::Converter::toRight(currentm);
+		    sendpc->sendout(mpSLAM->getCurrentFrame().cloud,finalm,time);
 		}
+	    }
 	}
+	
 	mpSLAM->getCurrentFrame().deletecloud();
-
 }
 
 

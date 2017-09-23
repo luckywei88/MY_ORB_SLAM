@@ -65,6 +65,10 @@ public:
     Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth);
 
     //----lucky----
+    bool deletepoints(const cv::Mat &detect);
+    void Init(const cv::Mat &imRGB, const cv::Mat &imDepth);
+    void Init();
+
     void createXYZRGBPointCloud(const cv::Mat& depth_img,const cv::Mat& rgb_img);
 
     // Extract ORB on the image. 0 for left image and 1 for right image.
@@ -120,7 +124,7 @@ public:
     // Backprojects a keypoint (if stereo/depth info available) into 3D world coordinates.
     cv::Mat UnprojectStereo(const int &i);
 
-    void deletecloud();    
+    void deletecloud();   
 
 public:
 
@@ -213,6 +217,8 @@ public:
 
     static bool mbInitialComputations;
     pointcloud_type* cloud;
+    cv::Mat mRGB;
+    cv::Mat mDepth;
 
 
 private:

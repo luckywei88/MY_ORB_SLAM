@@ -148,6 +148,7 @@ ${EIGEN3_LIBS}
 ${catkin_LIBRARIES}
 ${PCL_LIBRARIES}
 ${Pangolin_LIBRARIES}
+${MyLib}/libdarknet.so
 ${MyLib}/DBoW2/lib/libDBoW2.so
 ${MyLib}/g2o/lib/libg2o.so
 )
@@ -173,6 +174,13 @@ src/Sim3Solver.cc
 src/Initializer.cc
 src/Viewer.cc
 src/Send.cc
+src/AllConfig.cc
+src/Objects.cc
+src/Object.cc
+src/Yolo.cc
+)
+
+link_directories(${MyLib}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -181,13 +189,16 @@ ${LIBS}
 ## Declare a cpp executable
 # add_executable(orb_slam_node src/orb_slam_node.cpp)
 
-add_executable(Mono src/ros_mono.cc)
+add_executable(rgbd_tum src/DATASET/rgbd_tum.cc)
+target_link_libraries(rgbd_tum ${PROJECT_NAME} ${LIBS})
+
+add_executable(Mono src/ROS/ros_mono.cc)
 target_link_libraries(Mono ${PROJECT_NAME} ${LIBS})
 
-add_executable(Stereo src/ros_stereo.cc)
+add_executable(Stereo src/ROS/ros_stereo.cc)
 target_link_libraries(Stereo ${PROJECT_NAME} ${LIBS})
 
-add_executable(RGBD src/ros_rgbd.cc)
+add_executable(RGBD src/ROS/ros_rgbd.cc)
 target_link_libraries(RGBD ${PROJECT_NAME} ${LIBS})
 
 ## Add cmake target dependencies of the executable/library

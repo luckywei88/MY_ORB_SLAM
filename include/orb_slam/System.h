@@ -36,7 +36,11 @@
 #include "ORBVocabulary.h"
 #include "Viewer.h"
 #include "Send.h"
+//#include "Yolo.h"
+//#include "Cpf.h"
+#include "Objects.h"
 #include "Frame.h"
+#include "AllConfig.h"
 
 namespace ORB_SLAM2
 {
@@ -47,6 +51,7 @@ class Map;
 class Tracking;
 class LocalMapping;
 class LoopClosing;
+class AllConfig;
 
 class System
 {
@@ -61,9 +66,15 @@ public:
 public:
 
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = true);
+    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = false);
 
-    System(const string &strVocFile, const string &strSettingsFile, Send *sendpc,const eSensor sensor, const bool bUseViewer = true);
+    System(const string &strVocFile, const string &strSettingsFile, Send *sendpc,const eSensor sensor, const bool bUseViewer = false);
+
+    System(const string &strVocFile, const string &strSettingsFile, int type,Send *sendpc,const eSensor sensor, const bool bUseViewer = false);
+
+    System(AllConfig* config,const eSensor sensor);
+
+    void Init(const string &strVocFile, const string &strSettingsFile, int type,Send *sendpc, const bool bUseViewer = false);
 
     // Proccess the given stereo frame. Images must be synchronized and rectified.
     // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.

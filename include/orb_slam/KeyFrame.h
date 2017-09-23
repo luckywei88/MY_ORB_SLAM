@@ -27,6 +27,7 @@
 #include "ORBVocabulary.h"
 #include "ORBextractor.h"
 #include "Frame.h"
+#include "Object.h"
 #include "stdio.h"
 #include "KeyFrameDatabase.h"
 #include <pcl/point_types.h>
@@ -35,6 +36,7 @@
 #include <pcl/io/pcd_io.h>
 
 #include <mutex>
+#include <set>
 
 namespace ORB_SLAM2
 {
@@ -43,6 +45,7 @@ class Map;
 class MapPoint;
 class Frame;
 class KeyFrameDatabase;
+class Object;
 
 typedef pcl::PointXYZRGB point_type;
 typedef pcl::PointCloud<point_type> pointcloud_type;
@@ -52,11 +55,17 @@ class KeyFrame
 public:
     KeyFrame(Frame &F, Map* pMap, KeyFrameDatabase* pKFDB);
 
+    void DeleteFeature(int l,int r,int t,int b);
+    void CorrectMapPoint(cv::Mat &TcwR);
+
     // Pose functions
-    void SetPose(const cv::Mat &Tcw);
-    void WriteCloud(pointcloud_type* cloud);
+    void SetPose(const cv::Mat &Tcw_);
+    void SetPoseByRight(const cv::Mat &TcwR_);
+    void WriteCloud(pointcloud_type* cloud,int i);
+    void WriteCloud(pointcloud_type::Ptr cloud,int i);
     cv::Mat GetPose();
     cv::Mat GetPoseInverse();
+    cv::Mat GetPoseRight();
     cv::Mat GetCameraCenter();
     cv::Mat GetStereoCenter();
     cv::Mat GetRotation();
@@ -194,7 +203,11 @@ public:
     const int mnMaxX;
     const int mnMaxY;
     const cv::Mat mK;
-	
+
+    //lucky_add
+    cv::Mat mRGB;
+    cv::Mat mDepth;
+    std::set<Object*> KFObjs;
 
     // The following variables need to be accessed trough a mutex to be thread safe.
 protected:
@@ -206,8 +219,11 @@ protected:
 
     cv::Mat Cw; // Stereo middel point. Only for visualization
 
+    cv::Mat TwcR;
+
     // MapPoints associated to keypoints
     std::vector<MapPoint*> mvpMapPoints;
+    std::vector<MapPoint*> newMapPoints;
 
     // BoW
     KeyFrameDatabase* mpKeyFrameDB;
