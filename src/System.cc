@@ -145,7 +145,7 @@ System::System(AllConfig* config, const eSensor sensor)
 
     mpLocalMapper->SetTracker(mpTracker);
     mpLocalMapper->SetLoopCloser(mpLoopCloser);
- //   mpLocalMapper->SetObjects(objs);
+    mpLocalMapper->SetObjects(objs);
 
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);

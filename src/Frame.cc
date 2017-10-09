@@ -178,6 +178,7 @@ Frame::Frame(const cv::Mat &imRGB, const cv::Mat &imGray, const cv::Mat &imDepth
     }
 
     mb = mbf/fx;
+    Init(imRGB,imDepth);
 }
 
 void Frame::Init(const cv::Mat &imRGB, const cv::Mat &imDepth)
@@ -196,12 +197,11 @@ void Frame::Init(const cv::Mat &imRGB, const cv::Mat &imDepth)
 
     // This is done only for the first Frame (or after a change in the calibration)
 
-
+    cloud=NULL;
     AssignFeaturesToGrid();
-   // createXYZRGBPointCloud(imDepth,imRGB);
+//    createXYZRGBPointCloud(imDepth,imRGB);
     mRGB=imRGB;
     mDepth=imDepth;
-    cloud=NULL;
 }
 
 

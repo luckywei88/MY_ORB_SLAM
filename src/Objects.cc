@@ -41,6 +41,12 @@ int Objects::max_index(float *a, int n)
 
 }
 
+string Objects::getName(int i)
+{
+	string name(names[i]);
+	return name;
+}
+
 void Objects::detection(KeyFrame* kf)
 {
     cv::Mat rgb=kf->mRGB;
@@ -102,6 +108,7 @@ void Objects::detection(KeyFrame* kf)
     {
 	int clazz = max_index(probs[i],classes);
 	float prob=probs[i][clazz];
+	
 	if(prob>yolo->thresh)
 	{
 	    box b=boxes[i];
@@ -117,7 +124,7 @@ void Objects::detection(KeyFrame* kf)
 
 	    printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 	    string s(names[clazz]);
-	    if(s=="person")
+	    if(s=="personl")
 	    {
 		//delete unstable feature
 		kf->DeleteFeature(left,right,top,bot);
@@ -239,9 +246,14 @@ void Objects::computeICP(KeyFrame* kf,set<Object*>& objs)
     Eigen::Matrix4f finalm=icp->getFinalTransformation();
     cv::Mat finalpose=Converter::toCvMat(finalm);
     kf->CorrectMapPoint(finalpose);
+    cout<<"correct"<<endl;
+    cout<<finalm<<endl;
     finalm=finalm*ptm;
     //finalm=ptm*finalm;
     finalpose=Converter::toCvMat(finalm);
     kf->SetPoseByRight(finalpose);
 }
+
+
+
 }

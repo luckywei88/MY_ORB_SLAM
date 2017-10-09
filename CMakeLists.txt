@@ -148,7 +148,7 @@ ${EIGEN3_LIBS}
 ${catkin_LIBRARIES}
 ${PCL_LIBRARIES}
 ${Pangolin_LIBRARIES}
-${MyLib}/libdarknet.so
+${MyLib}/darknet/libdarknet.so
 ${MyLib}/DBoW2/lib/libDBoW2.so
 ${MyLib}/g2o/lib/libg2o.so
 )

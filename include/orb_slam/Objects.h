@@ -43,6 +43,8 @@ namespace ORB_SLAM2
 	std::list<PointC::Ptr> tmpPCs;
 	std::list<float*> tmpProbs;
 
+	std::string getName(int i);	
+
 	//detect type
 	int classes;
 	char **names;

@@ -223,13 +223,11 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 		else
 			cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
 	}
-	   
 	if(mDepthMapFactor!=1 || imDepth.type()!=CV_32F)
 	{
 		imDepth.convertTo(imDepth,CV_32FC1,mDepthMapFactor,0);
 	//	imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
 	}
-
 	mCurrentFrame = Frame(imRGB,mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 	Track();
 	return mCurrentFrame.mTcw.clone();

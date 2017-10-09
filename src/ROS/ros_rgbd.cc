@@ -46,8 +46,7 @@
 #include "Converter.h"
 
 using namespace std;
-int i,type;
-string bg,config,world,base,odom;
+string bg,config;
 bool enable_ros;
 ORB_SLAM2::Send *sendpc;
 
@@ -63,10 +62,6 @@ public:
 
 int main(int argc, char **argv)
 {
-	bool gui;
-	i=0;
-	type=0;
-	gui=true;
 	enable_ros=true;
 	ros::init(argc, argv, "RGBD");
 	ros::start();
@@ -138,7 +133,7 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const senso
 	}
 	const ros::Time time=cv_ptrRGB->header.stamp;	
 	cv::Mat pose=mpSLAM->TrackRGBD(cv_ptrRGB->image,cv_ptrD->image,cv_ptrRGB->header.stamp.toSec());
-	bool enable_ros=true;
+	bool enable_ros=false;
 	if(enable_ros)
 	{
 	    if(!sendpc->getloop())

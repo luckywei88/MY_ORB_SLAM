@@ -24,6 +24,7 @@ namespace ORB_SLAM2
     	    typedef pcl::PointCloud<PointT> PointC;
 
 	    Object(KeyFrame* kf, PointC::Ptr pc, float* prob, int n);
+	    ~Object();
 	    //probility
 	    std::vector<float> probs;
 	    //max prob
@@ -37,14 +38,13 @@ namespace ORB_SLAM2
 	    //All pc
 	    PointC::Ptr AllPC;
 	    //KdTree
-	    pcl::KdTreeFLANN<PointT> kdtree;
+	    pcl::KdTreeFLANN<PointT> *kdtree;
 
 	    bool compare(int type, PointC::Ptr pc);
 	    void add(KeyFrame* kf, PointC::Ptr pc, float* prob);
 	    void remove(KeyFrame*);
 	    float getProb();
 	    int getType();
-	    void SetPC(PointC::Ptr pc);
 	    PointC::Ptr GetPC();
     };
 }

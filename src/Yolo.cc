@@ -25,7 +25,8 @@ namespace ORB_SLAM2
 		double time=what_time_is_it_now();
 		network_predict(net, X);
 		printf("Predicted in %f seconds.\n", what_time_is_it_now()-time);
-		get_region_boxes(l, im.w, im.h, net.w, net.h, thresh, probs, boxes, masks, 0, 0, hier_thresh, 1);	
+		get_region_boxes(l, im.w, im.h, net.w, net.h, thresh, probs, boxes, masks, 0, 0, hier_thresh, 1);
+		do_nms_obj(boxes,probs,l.w*l.h*l.n,l.classes,0.3);	
 	}
 
 
@@ -81,7 +82,7 @@ namespace ORB_SLAM2
 	void Yolo::yolo_detect(IplImage* input)
 	{
 		image out=ipl_to_image(input);
-		layer l=net.layers[net.n-1];
+		l=net.layers[net.n-1];
 		total=l.w*l.h*l.n;
 		classes=l.classes;
 		boxes = (box*)calloc(total, sizeof(box));
