@@ -132,17 +132,17 @@ protected:
     void CreateInitialMapMonocular();
 
     void CheckReplacedInLastFrame();
-    bool TrackReferenceKeyFrame();
+    int TrackReferenceKeyFrame();
     void UpdateLastFrame();
     bool TrackWithMotionModel();
 
-    bool Relocalization();
+    int Relocalization();
 
     void UpdateLocalMap();
     void UpdateLocalPoints();
     void UpdateLocalKeyFrames();
 
-    bool TrackLocalMap();
+    bool TrackLocalMap(int match);
     void SearchLocalPoints();
 
     bool NeedNewKeyFrame();

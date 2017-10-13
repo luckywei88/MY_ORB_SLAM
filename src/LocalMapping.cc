@@ -102,8 +102,10 @@ void LocalMapping::DetectAndCombine()
 	float* prob=*ProbsBegin;
     	set<Object*>::iterator tmpStart=ObjsIt;
 	cout<<objs->getName(type)<<endl;
+/*
 	if(pc->size()>0)	
 		mpCurrentKeyFrame->WriteCloud(pc,100+p);
+*/
 	while(tmpStart!=ObjsEnd)
 	{
 	    Object* obj=*tmpStart;
@@ -134,6 +136,7 @@ void LocalMapping::DetectAndCombine()
     cout<<"mpCurrentKeyFrame Objects "<<mpCurrentKeyFrame->KFObjs.size()<<endl;
     cout<<"Total Objs "<<objs->vector.size()<<endl;
 
+/*
    list<Object*>::iterator tmpobjstart=objs->vector.begin(); 
    list<Object*>::iterator tmpobjend=objs->vector.end();
    int k=0;
@@ -150,6 +153,7 @@ void LocalMapping::DetectAndCombine()
        {
 	   KeyFrame* kf=mapstart->first;
 	   PointC::Ptr pc=mapstart->second;
+*/
 	   /*
 	   cv::Mat pose;
 	   kf->GetPose().copyTo(pose);
@@ -158,6 +162,7 @@ void LocalMapping::DetectAndCombine()
 	   Rwc = pose.rowRange(0,3).colRange(0,3).t();
 	   twc = -Rwc*pose.rowRange(0,3).col(3);
 	   */
+/*
 	   cv::Mat pose=kf->GetPoseRight();
 	   Eigen::Matrix4f ptm(4,4);
 	   ptm<<
@@ -165,6 +170,7 @@ void LocalMapping::DetectAndCombine()
 	       pose.at<float>(1,0),pose.at<float>(1,1),pose.at<float>(1,2),pose.at<float>(1,3),
 	       pose.at<float>(2,0),pose.at<float>(2,1),pose.at<float>(2,2),pose.at<float>(2,3),
 	       0,0,0,1;
+*/
 	  /* 
 	   Eigen::Matrix4f pt(4,4);
 	   pt<<
@@ -175,6 +181,7 @@ void LocalMapping::DetectAndCombine()
 	       
 	   pcl::transformPointCloud(*pc,*tmppc,ptm*pt);
 	   */
+/*
 	   PointC::Ptr tmppc(new PointC);
 	   pcl::transformPointCloud(*pc,*tmppc,ptm);
 	   *totalpc+=*tmppc;
@@ -189,7 +196,7 @@ void LocalMapping::DetectAndCombine()
    if(allpc->size()>0)
    	mpCurrentKeyFrame->WriteCloud(allpc,99);
    delete allpc;
-
+*/
 }
 
 
@@ -905,6 +912,7 @@ void LocalMapping::ResetIfRequested()
     unique_lock<mutex> lock(mMutexReset);
     if(mbResetRequested)
     {
+	objs->Reset();
 	mlNewKeyFrames.clear();
 	mlpRecentAddedMapPoints.clear();
 	mbResetRequested=false;

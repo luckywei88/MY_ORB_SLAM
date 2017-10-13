@@ -34,6 +34,7 @@ namespace ORB_SLAM2
         int max_index(float *a , int n);	
 	void addDataBase(Object* obj);
 	void computeICP(KeyFrame* kf,set<Object*>& objs);
+	void Reset();
 
 	//all object
 	std::list<Object*> vector;

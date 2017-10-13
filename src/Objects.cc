@@ -47,211 +47,222 @@ string Objects::getName(int i)
 	return name;
 }
 
+void Objects::Reset()
+{
+	for(auto it=vector.begin(); it!= vector.end(); it++)
+		delete *it;
+	vector.clear();
+	tmpTypes.clear();
+	tmpPCs.clear();
+	tmpProbs.clear();
+}
+
 void Objects::detection(KeyFrame* kf)
 {
-    cv::Mat rgb=kf->mRGB;
-    cv::Mat depth=kf->mDepth;
-    IplImage* img=new IplImage(rgb);
-    yolo->yolo_detect(img);
+	cv::Mat rgb=kf->mRGB;
+	cv::Mat depth=kf->mDepth;
+	IplImage* img=new IplImage(rgb);
+	yolo->yolo_detect(img);
 
-    classes=yolo->classes;	//类别数量
-    names=yolo->names;	//类别
+	classes=yolo->classes;	//类别数量
+	names=yolo->names;	//类别
 
-    int total=yolo->total;	//检测结果数量
-    float **probs=yolo->probs;	//检测结果概率
-    box *boxes=yolo->boxes;	//检测结果位置
+	int total=yolo->total;	//检测结果数量
+	float **probs=yolo->probs;	//检测结果概率
+	box *boxes=yolo->boxes;	//检测结果位置
 
-    int w=rgb.cols;
-    int h=rgb.rows;
-    printf("start print result\n");
-    tmpTypes.clear();
-    tmpProbs.clear();
-    tmpPCs.clear();
-    float fxinv=kf->invfx;
-    float fyinv=kf->invfy;
-    float cx=kf->cx;
-    float cy=kf->cy;
+	int w=rgb.cols;
+	int h=rgb.rows;
+	printf("start print result\n");
+	tmpTypes.clear();
+	tmpPCs.clear();
+	tmpProbs.clear();
+	float fxinv=kf->invfx;
+	float fyinv=kf->invfy;
+	float cx=kf->cx;
+	float cy=kf->cy;
 
-    //pointcloud
-    /*PointC* cloud=new PointC();
-    for(int i=0;i<h;i++)
-    {
-	for(int j=0;j<w;j++)
+	//pointcloud
+	/*PointC* cloud=new PointC();
+	  for(int i=0;i<h;i++)
+	  {
+	  for(int j=0;j<w;j++)
+	  {
+	  float z=depth.at<float>(i,j);
+	  if(z<0.01||z>5)
+	  {
+	  pc[i][j]=NULL;
+	  continue;
+	  }
+	  float y=(i-cy)*z*fyinv;
+	  float x=(j-cx)*z*fxinv;
+	  cv::Vec3b color=rgb.at<cv::Vec3b>(i,j);
+	  PointT* pt=new PointT();
+	  pt->x=x;
+	  pt->y=y;
+	  pt->z=z;
+	  unsigned char r=(unsigned char)color[0];
+	  unsigned char g=(unsigned char)color[1];
+	  unsigned char b=(unsigned char)color[2];
+	  unsigned int col=(r<<16)|(g<<8)|b;
+	  pt->rgb=*reinterpret_cast<float*>(&col);
+	  cloud->push_back(*pt);
+	  }
+	  }
+	  cout<<"cloud "<<cloud->size()<<endl;
+	  kf->WriteCloud(cloud);
+	 */
+
+	// hehe
+	for(int i=0;i<total;i++)
 	{
-	    float z=depth.at<float>(i,j);
-	    if(z<0.01||z>5)
-	    {
-		pc[i][j]=NULL;
-		continue;
-	    }
-	    float y=(i-cy)*z*fyinv;
-	    float x=(j-cx)*z*fxinv;
-	    cv::Vec3b color=rgb.at<cv::Vec3b>(i,j);
-	    PointT* pt=new PointT();
-	    pt->x=x;
-	    pt->y=y;
-	    pt->z=z;
-	    unsigned char r=(unsigned char)color[0];
-	    unsigned char g=(unsigned char)color[1];
-	    unsigned char b=(unsigned char)color[2];
-	    unsigned int col=(r<<16)|(g<<8)|b;
-	    pt->rgb=*reinterpret_cast<float*>(&col);
-	    cloud->push_back(*pt);
-	}
-    }
-    cout<<"cloud "<<cloud->size()<<endl;
-    kf->WriteCloud(cloud);
-    */
-    
-    // hehe
-    for(int i=0;i<total;i++)
-    {
-	int clazz = max_index(probs[i],classes);
-	float prob=probs[i][clazz];
-	
-	if(prob>yolo->thresh)
-	{
-	    box b=boxes[i];
-	    int left  = (b.x-b.w/2.)*w;
-	    int right = (b.x+b.w/2.)*w;
-	    int top   = (b.y-b.h/2.)*h;
-	    int bot   = (b.y+b.h/2.)*h;
+		int clazz = max_index(probs[i],classes);
+		float prob=probs[i][clazz];
 
-	    if(left < 0) left = 0;
-	    if(right > w-1) right = w-1;
-	    if(top < 0) top = 0;
-	    if(bot > h-1) bot = h-1;
-
-	    printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
-	    string s(names[clazz]);
-	    if(s=="personl")
-	    {
-		//delete unstable feature
-		kf->DeleteFeature(left,right,top,bot);
-
-	    }
-	    else
-	    {
-		//segmentation
-		PointC::Ptr cloud(new PointC);
-		for(int n=top;n<bot+1;n++)
+		if(prob>yolo->thresh)
 		{
-		    for(int j=left;j<right+1;j++)
-		    {
-			float z=depth.at<float>(n,j);
-			if(z<0.01||z>5)
+			box b=boxes[i];
+			int left  = (b.x-b.w/2.)*w;
+			int right = (b.x+b.w/2.)*w;
+			int top   = (b.y-b.h/2.)*h;
+			int bot   = (b.y+b.h/2.)*h;
+
+			if(left < 0) left = 0;
+			if(right > w-1) right = w-1;
+			if(top < 0) top = 0;
+			if(bot > h-1) bot = h-1;
+
+			printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
+			string s(names[clazz]);
+			if(s=="person")
 			{
-			    continue;
+				//delete unstable feature
+				kf->DeleteFeature(left,right,top,bot);
+
 			}
-			float y=(n-cy)*z*fyinv;
-			float x=(j-cx)*z*fxinv;
-			cv::Vec3b color=rgb.at<cv::Vec3b>(n,j);
-			PointT pt;
-			pt.x=x;
-			pt.y=y;
-			pt.z=z;
-			unsigned char r=(unsigned char)color[0];
-			unsigned char g=(unsigned char)color[1];
-			unsigned char b=(unsigned char)color[2];
-			unsigned int col=(r<<16)|(g<<8)|b;
-			pt.rgb=*reinterpret_cast<float*>(&col);
-			cloud->push_back(pt);	 
-		    }
-		}
-		vg->setInputCloud(cloud);
-		vg->filter(*cloud);
+			else
+			{
+				//segmentation
+				PointC::Ptr cloud(new PointC);
+				for(int n=top;n<bot+1;n++)
+				{
+					for(int j=left;j<right+1;j++)
+					{
+						float z=depth.at<float>(n,j);
+						if(z<0.01)
+						{
+							continue;
+						}
+						float y=(n-cy)*z*fyinv;
+						float x=(j-cx)*z*fxinv;
+						cv::Vec3b color=rgb.at<cv::Vec3b>(n,j);
+						PointT pt;
+						pt.x=x;
+						pt.y=y;
+						pt.z=z;
+						unsigned char r=(unsigned char)color[0];
+						unsigned char g=(unsigned char)color[1];
+						unsigned char b=(unsigned char)color[2];
+						unsigned int col=(r<<16)|(g<<8)|b;
+						pt.rgb=*reinterpret_cast<float*>(&col);
+						cloud->push_back(pt);	 
+					}
+				}
 
-		Eigen::Matrix4f pt(4,4);
-		pt<<
-		    0, 0, 1, 0,
-		    -1, 0, 0, -0.05,
-		    0,-1, 0, 0,
-		    0, 0, 0, 1;
-		pcl::transformPointCloud(*cloud,*cloud,pt);
-		//	    cpf->Segment(cloud);
-		//kf->writeCloud(cpf->Segment(cloud),i);
-		//kf->WriteCloud(cloud,i);
+				vg->setInputCloud(cloud);
+				vg->filter(*cloud);
 
-		//add result
-		tmpTypes.push_back(clazz);
-		tmpPCs.push_back(cloud);
-		float* tmpProb=(float*)calloc(classes,sizeof(float));
-		for(int j=0;j<classes;j++)
-		{
-		    tmpProb[j]=probs[i][j]*100.0;
+				Eigen::Matrix4f pt(4,4);
+				pt<<
+					0, 0, 1, 0,
+					-1, 0, 0, -0.05,
+					0,-1, 0, 0,
+					0, 0, 0, 1;
+				pcl::transformPointCloud(*cloud,*cloud,pt);
+				//	    cpf->Segment(cloud);
+				//kf->writeCloud(cpf->Segment(cloud),i);
+				//kf->WriteCloud(cloud,i);
+
+				//add result
+				tmpTypes.push_back(clazz);
+				tmpPCs.push_back(cloud);
+				float* tmpProb=(float*)calloc(classes,sizeof(float));
+				for(int j=0;j<classes;j++)
+				{
+					tmpProb[j]=probs[i][j]*100.0;
+				}
+				tmpProbs.push_back(tmpProb);
+			}
 		}
-		tmpProbs.push_back(tmpProb);
-	    }
 	}
-    }
-    yolo->delet();
+	yolo->delet();
 }
 
 void Objects::addDataBase(Object* obj)
 {
-    vector.push_back(obj);
+	vector.push_back(obj);
 }
 
 void Objects::computeICP(KeyFrame* kf,set<Object*>& objs)
 {
-    if(objs.size()==0||tmpPCs.size()==0)
-	return;
-    set<Object*>::iterator tmpobjstart=objs.begin();
-    set<Object*>::iterator tmpobjend=objs.end();
-    int k=0;
-    PointC::Ptr target(new PointC);
-    while(tmpobjstart!=tmpobjend)
-    {
-	Object* tmpobj=*tmpobjstart;
-	auto mapstart=tmpobj->pcmap.begin();
-	auto mapend=tmpobj->pcmap.end();
-	PointC::Ptr totalpc(new PointC);
-	while(mapstart!=mapend)
+	if(objs.size()==0||tmpPCs.size()==0)
+		return;
+	set<Object*>::iterator tmpobjstart=objs.begin();
+	set<Object*>::iterator tmpobjend=objs.end();
+	int k=0;
+	PointC::Ptr target(new PointC);
+	while(tmpobjstart!=tmpobjend)
 	{
-	    KeyFrame* kf=mapstart->first;
-	    PointC::Ptr pc=mapstart->second;
+		Object* tmpobj=*tmpobjstart;
+		auto mapstart=tmpobj->pcmap.begin();
+		auto mapend=tmpobj->pcmap.end();
+		PointC::Ptr totalpc(new PointC);
+		while(mapstart!=mapend)
+		{
+			KeyFrame* kf=mapstart->first;
+			PointC::Ptr pc=mapstart->second;
 
-	    cv::Mat pose=kf->GetPoseRight();
-	    Eigen::Matrix4f ptm=Converter::toMatrix4d(pose);
+			cv::Mat pose=kf->GetPoseRight();
+			Eigen::Matrix4f ptm=Converter::toMatrix4d(pose);
 
-	    PointC::Ptr tmppc(new PointC);
-	    pcl::transformPointCloud(*pc,*tmppc,ptm);
-	    *totalpc+=*tmppc;
-	    mapstart++;
+			PointC::Ptr tmppc(new PointC);
+			pcl::transformPointCloud(*pc,*tmppc,ptm);
+			*totalpc+=*tmppc;
+			mapstart++;
+		}
+		tmpobjstart++;
+		k++;
+		*target+=*totalpc;
 	}
-	tmpobjstart++;
-	k++;
-	*target+=*totalpc;
-    }
 
-    PointC::Ptr input(new PointC);
-    list<PointC::Ptr>::iterator PCsBegin=tmpPCs.begin();
-    list<PointC::Ptr>::iterator PCsEnd=tmpPCs.end();
-    while(PCsBegin!=PCsEnd)
-    {
-	PointC::Ptr tmppc=*PCsBegin;
-	*input+=*tmppc;
-	PCsBegin++;
-    }
-    cv::Mat pose=kf->GetPoseRight();
-    Eigen::Matrix4f ptm=Converter::toMatrix4d(pose);
+	PointC::Ptr input(new PointC);
+	list<PointC::Ptr>::iterator PCsBegin=tmpPCs.begin();
+	list<PointC::Ptr>::iterator PCsEnd=tmpPCs.end();
+	while(PCsBegin!=PCsEnd)
+	{
+		PointC::Ptr tmppc=*PCsBegin;
+		*input+=*tmppc;
+		PCsBegin++;
+	}
+	cv::Mat pose=kf->GetPoseRight();
+	Eigen::Matrix4f ptm=Converter::toMatrix4d(pose);
 
-    pcl::transformPointCloud(*input,*input,ptm);
+	pcl::transformPointCloud(*input,*input,ptm);
 
-    icp->setInputSource(input);
-    icp->setInputTarget(target);
-    PointC::Ptr finalpc(new PointC);
-    icp->align(*finalpc);
+	icp->setInputSource(input);
+	icp->setInputTarget(target);
+	PointC::Ptr finalpc(new PointC);
+	icp->align(*finalpc);
 
-    Eigen::Matrix4f finalm=icp->getFinalTransformation();
-    cv::Mat finalpose=Converter::toCvMat(finalm);
-    kf->CorrectMapPoint(finalpose);
-    cout<<"correct"<<endl;
-    cout<<finalm<<endl;
-    finalm=finalm*ptm;
-    //finalm=ptm*finalm;
-    finalpose=Converter::toCvMat(finalm);
-    kf->SetPoseByRight(finalpose);
+	Eigen::Matrix4f finalm=icp->getFinalTransformation();
+	cv::Mat finalpose=Converter::toCvMat(finalm);
+	kf->CorrectMapPoint(finalpose);
+	cout<<"correct"<<endl;
+	cout<<finalm<<endl;
+	finalm=finalm*ptm;
+	//finalm=ptm*finalm;
+	finalpose=Converter::toCvMat(finalm);
+	kf->SetPoseByRight(finalpose);
 }
 
 

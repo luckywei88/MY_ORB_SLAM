@@ -78,11 +78,11 @@ namespace ORB_SLAM2
 			    if(kdtree->nearestKSearch(pc->at(i),k,IdxVector,SDisVector))
 			    {
 				    find++;
-				    PointT pt=pc->at(i);
+				    //PointT pt=pc->at(i);
 				    //cout<<"pt "<<pt.x<<" "<<pt.y<<" "<<pt.z<<endl;
 				    float dis=SDisVector[0];
 				    //cout<<"dis "<<dis<<endl;
-				    if(dis<=0.004)
+				    if(dis<=0.02)
 					    confirm++;
 			    }
 		    }
@@ -113,6 +113,8 @@ namespace ORB_SLAM2
 
     Object::~Object()
     {
+	    probs.clear();
+            pcmap.clear();
 	    delete kdtree;
     }
 }
