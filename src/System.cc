@@ -64,6 +64,7 @@ System::System(AllConfig* config, const eSensor sensor)
     string yolo_d=config->yolo_data;
     string yolo_w=config->yolo_weight;
     string yolo_c=config->yolo_cfg;
+    string yolo_l=config->yolo_label;
     string world=config->world;
     string base=config->base;
     string odom=config->odom;
@@ -93,7 +94,7 @@ System::System(AllConfig* config, const eSensor sensor)
     }
 
 
-    Objects* objs=new Objects(yolo_d,yolo_c,yolo_w);
+    Objects* objs=new Objects(yolo_d,yolo_c,yolo_w,yolo_l);
 
     //Load ORB Vocabulary
     cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
@@ -116,6 +117,7 @@ System::System(AllConfig* config, const eSensor sensor)
 
     //Create Drawers. These are used by the Viewer
     mpFrameDrawer = new FrameDrawer(mpMap);
+    mpKeyFrameDrawer = new KeyFrameDrawer();
     mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);
 
     //Initialize the Tracking thread
@@ -132,9 +134,11 @@ System::System(AllConfig* config, const eSensor sensor)
     mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
 
     //Initialize the Viewer thread and launch
-    mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile);
+    mpViewer = new Viewer(this, mpFrameDrawer, mpKeyFrameDrawer,mpMapDrawer, mpTracker,strSettingsFile);
     if(gui)
 	mptViewer = new thread(&Viewer::Run, mpViewer);
+
+    objs->SetKeyFrameDrawer(mpKeyFrameDrawer);
 
     mpTracker->SetViewer(mpViewer);
 
@@ -224,7 +228,7 @@ void System::Init(const string &strVocFile, const string &strSettingsFile, int t
     mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
 
     //Initialize the Viewer thread and launch
-    mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile);
+    mpViewer = new Viewer(this, mpFrameDrawer,  mpMapDrawer,mpTracker,strSettingsFile);
     if(bUseViewer)
 	mptViewer = new thread(&Viewer::Run, mpViewer);
 

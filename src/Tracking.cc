@@ -204,8 +204,23 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
 }
 
 
-cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp)
+cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB1,const cv::Mat &imD1, const double &timestamp)
 {
+	cv::Mat imRGB,imD;
+	if(imRGB1.cols!=320&&imRGB1.rows!=240)
+	{
+		cv::Size dsize=cv::Size(320,240);
+		imRGB = cv::Mat(dsize,imRGB1.type());
+		resize(imRGB1,imRGB,dsize);
+		imD = cv::Mat(dsize,imD1.type());
+		resize(imD1,imD,dsize);
+	}
+	else
+	{
+		imRGB=imRGB1;
+		imD=imD1;
+	}
+
 	mImGray = imRGB.clone();
 	cv::Mat imDepth = imD;
 
@@ -226,7 +241,7 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 	if(mDepthMapFactor!=1 || imDepth.type()!=CV_32F)
 	{
 		imDepth.convertTo(imDepth,CV_32FC1,mDepthMapFactor,0);
-	//	imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
+		//	imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
 	}
 	mCurrentFrame = Frame(imRGB,mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 	Track();
@@ -303,6 +318,7 @@ void Tracking::Track()
 				// Local Mapping might have changed some MapPoints tracked in last frame
 				CheckReplacedInLastFrame();
 				firstMatch = TrackReferenceKeyFrame();
+				cout<<"reference key frame "<<firstMatch<<endl;
 				if(firstMatch>=10)
 					bOK=true;
 				else
@@ -327,7 +343,8 @@ void Tracking::Track()
 			else
 			{
 				firstMatch = Relocalization();
-				if(firstMatch>=50)
+				cout<<"relocalization "<<firstMatch<<endl;
+				if(firstMatch>=40)
 					bOK=true;
 				else
 					bOK=false;
@@ -487,7 +504,7 @@ void Tracking::Track()
 		// Reset if the camera get lost soon after initialization
 		if(mState==LOST)
 		{
-			if(mpMap->KeyFramesInMap()<3)
+			if(mpMap->KeyFramesInMap()<2)
 			{
 				cout << "Track lost soon after initialisation, reseting..." << endl;
 				mpSystem->Reset();
@@ -1044,12 +1061,17 @@ bool Tracking::TrackLocalMap(int match)
 
 	// Decide if the tracking was succesful
 	// More restrictive if there was a relocalization recently
-	if(mCurrentFrame.mnId<mnLastRelocFrameId+mMaxFrames && mnMatchesInliers<match+20)
-	{
-		return false;
-	}
+	/*
+	   cout<<"local map " +mnMatchesInliers<<endl;
+	   if(mCurrentFrame.mnId<mnLastRelocFrameId+mMaxFrames && mnMatchesInliers<match+20)
+	   {
+	   cout<<"local map false"<<endl;
+	   return false;
+	   }
+	 */
 	if(mnMatchesInliers<match)
 	{
+		cout<<"second local map false"<<endl;
 		return false;
 	}
 	else
@@ -1122,6 +1144,9 @@ bool Tracking::NeedNewKeyFrame()
 
 	if(mSensor==System::MONOCULAR)
 		thRefRatio = 0.9f;
+
+	//lucky
+	thRefRatio=0.85f;
 
 	float thMapRatio = 0.35f;
 	if(mnMatchesInliers>300)

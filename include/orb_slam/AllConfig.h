@@ -17,6 +17,7 @@ namespace ORB_SLAM2
 	    std::string yolo_data;
 	    std::string yolo_weight;
 	    std::string yolo_cfg;
+	    std::string yolo_label;
 	    std::string world;
 	    std::string base;
 	    std::string odom;

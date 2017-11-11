@@ -23,6 +23,7 @@
 #define VIEWER_H
 
 #include "FrameDrawer.h"
+#include "KeyFrameDrawer.h"
 #include "MapDrawer.h"
 #include "Tracking.h"
 #include "System.h"
@@ -34,12 +35,14 @@ namespace ORB_SLAM2
 
 class Tracking;
 class FrameDrawer;
+class KeyFrameDrawer;
 class MapDrawer;
 class System;
 
 class Viewer
 {
 public:
+    Viewer(System* pSystem, FrameDrawer* pFrameDrawer, KeyFrameDrawer* pKeyFrameDrawer, MapDrawer* pMapDrawer, Tracking *pTracking, const string &strSettingPath);
     Viewer(System* pSystem, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Tracking *pTracking, const string &strSettingPath);
 
     // Main thread function. Draw points, keyframes, the current camera pose and the last processed
@@ -62,6 +65,7 @@ private:
 
     System* mpSystem;
     FrameDrawer* mpFrameDrawer;
+    KeyFrameDrawer* mpKeyFrameDrawer;
     MapDrawer* mpMapDrawer;
     Tracking* mpTracker;
 

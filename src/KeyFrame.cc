@@ -572,7 +572,7 @@ void KeyFrame::SetBadFlag()
     char file[100];
     sprintf(file,"/home/lucky/pcd/tmpcd/pc%ld.pcd",mnId);
     remove(file);
-
+    
     for(set<Object*>::iterator sit=KFObjs.begin(),send=KFObjs.end();sit!=send;sit++)
     {
 	Object* obj=*sit;

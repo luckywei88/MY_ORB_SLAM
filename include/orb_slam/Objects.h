@@ -6,6 +6,7 @@
 //#include "Cpf.h"
 #include "KeyFrame.h"
 #include "Converter.h"
+#include "KeyFrameDrawer.h"
 #include <list>
 #include <vector>
 #include <string>
@@ -22,6 +23,7 @@ namespace ORB_SLAM2
  //   class CPF;
     class Object;
     class KeyFrame;
+    class KeyFrameDrawer;
 
     class Objects
     {
@@ -29,18 +31,20 @@ namespace ORB_SLAM2
     	typedef pcl::PointXYZRGB PointT;
     	typedef pcl::PointCloud<PointT> PointC;
 
-	Objects(std::string yolo_d,std::string yolo_c,std::string yolo_w);
+	Objects(std::string yolo_d,std::string yolo_c,std::string yolo_w, std::string yolo_l);
 	void detection(KeyFrame* kf);
         int max_index(float *a , int n);	
 	void addDataBase(Object* obj);
 	void computeICP(KeyFrame* kf,set<Object*>& objs);
 	void Reset();
+	void SetKeyFrameDrawer(KeyFrameDrawer* keyframedrawer);
 
 	//all object
 	std::list<Object*> vector;
 
 	//detect result
-	std::list<int> tmpTypes;
+	std::vector<int> tmpBox;
+	std::vector<int> tmpTypes;
 	std::list<PointC::Ptr> tmpPCs;
 	std::list<float*> tmpProbs;
 
@@ -52,6 +56,7 @@ namespace ORB_SLAM2
 
     private:
 	Yolo* yolo;
+	KeyFrameDrawer* keyframedrawer;
 //	CPF* cpf;
 	pcl::VoxelGrid<PointT>* vg;
 	pcl::IterativeClosestPoint<PointT,PointT>* icp;

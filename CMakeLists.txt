@@ -178,6 +178,7 @@ src/AllConfig.cc
 src/Objects.cc
 src/Object.cc
 src/Yolo.cc
+src/KeyFrameDrawer.cc
 )
 
 link_directories(${MyLib}

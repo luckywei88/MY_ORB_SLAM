@@ -26,8 +26,8 @@
 namespace ORB_SLAM2
 {
 
-Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath):
-    mpSystem(pSystem), mpFrameDrawer(pFrameDrawer),mpMapDrawer(pMapDrawer), mpTracker(pTracking),
+Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, KeyFrameDrawer *pKeyFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath):
+    mpSystem(pSystem), mpFrameDrawer(pFrameDrawer), mpKeyFrameDrawer(pKeyFrameDrawer), mpMapDrawer(pMapDrawer), mpTracker(pTracking),
     mbFinishRequested(false), mbFinished(true), mbStopped(false), mbStopRequested(false)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
@@ -49,6 +49,33 @@ Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer
     mViewpointY = fSettings["Viewer.ViewpointY"];
     mViewpointZ = fSettings["Viewer.ViewpointZ"];
     mViewpointF = fSettings["Viewer.ViewpointF"];
+}
+
+Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath):
+    mpSystem(pSystem), mpFrameDrawer(pFrameDrawer),  mpMapDrawer(pMapDrawer), mpTracker(pTracking),
+    mbFinishRequested(false), mbFinished(true), mbStopped(false), mbStopRequested(false)
+{
+    cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
+
+    float fps = fSettings["Camera.fps"];
+    if(fps<1)
+        fps=30;
+    mT = 1e3/fps;
+
+    mImageWidth = fSettings["Camera.width"];
+    mImageHeight = fSettings["Camera.height"];
+    if(mImageWidth<1 || mImageHeight<1)
+    {
+        mImageWidth = 640;
+        mImageHeight = 480;
+    }
+
+    mViewpointX = fSettings["Viewer.ViewpointX"];
+    mViewpointY = fSettings["Viewer.ViewpointY"];
+    mViewpointZ = fSettings["Viewer.ViewpointZ"];
+    mViewpointF = fSettings["Viewer.ViewpointF"];
+
+    mpKeyFrameDrawer=NULL;
 }
 
 void Viewer::Run()
@@ -135,6 +162,11 @@ void Viewer::Run()
         pangolin::FinishFrame();
 
         cv::Mat im = mpFrameDrawer->DrawFrame();
+	if(mpKeyFrameDrawer!=NULL)
+	{
+        	cv::Mat imKey = mpKeyFrameDrawer->DrawKeyFrame();
+		cv::imshow("ORB-SLAM2: Current KeyFrame ",imKey);
+	}
         cv::imshow("ORB-SLAM2: Current Frame",im);
         cv::waitKey(mT);
 

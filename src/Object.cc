@@ -17,8 +17,7 @@ namespace ORB_SLAM2
 		clazz=i;
 	    }
 	}
-	PointC::Ptr tmp(new PointC);
-	AllPC=tmp;
+	AllPC=boost::make_shared<PointC>();
 	cout<<"start "<<endl;
 	*AllPC+=*pc;
 	kdtree=new pcl::KdTreeFLANN<PointT>();
@@ -49,7 +48,7 @@ namespace ORB_SLAM2
     void Object::remove(KeyFrame* kf)
     {
 	pcmap.erase(kf);
-	AllPC=NULL;
+	AllPC=boost::make_shared<PointC>();
 	for(auto start=pcmap.begin();start!=pcmap.end();start++)
 	{
 		*AllPC+=*(start->second);
@@ -62,9 +61,11 @@ namespace ORB_SLAM2
 
     bool Object::compare(int type, PointC::Ptr pc)
     {
-	
+/*	
 	    if(type==clazz)
 	    {
+*/
+		
 		    int k=1;
 		    size_t size=pc->size();
 		    cout<<" pc "<<pc->size()<<endl;
@@ -73,6 +74,7 @@ namespace ORB_SLAM2
 		    std::vector<float> SDisVector(k);
 		    size_t confirm=0;
 		    size_t find=0;
+			
 		    for(size_t i=0;i<size;i++)
 		    {
 			    if(kdtree->nearestKSearch(pc->at(i),k,IdxVector,SDisVector))
@@ -85,14 +87,17 @@ namespace ORB_SLAM2
 				    if(dis<=0.02)
 					    confirm++;
 			    }
-		    }
+			    }
+			 
 		    cout<<"confirm "<<confirm<<endl;
 		    cout<<"find "<<find<<endl;
 		    cout<<"score "<<(double)confirm/(double)size<<endl;
 		    if(confirm*2>=size)
 			    return true;
-	    }
-	    return false;
+		
+//		    return true;
+//	    }
+	    	   return false;
 
     }
 
@@ -114,7 +119,7 @@ namespace ORB_SLAM2
     Object::~Object()
     {
 	    probs.clear();
-            pcmap.clear();
+	    pcmap.clear();
 	    delete kdtree;
     }
 }

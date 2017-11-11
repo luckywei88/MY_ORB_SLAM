@@ -58,8 +58,10 @@ void LocalMapping::DetectAndCombine()
     objs->detection(mpCurrentKeyFrame);
     //get Detect Result
     cout<<"Type size "<<objs->tmpTypes.size()<<endl;
-    list<int>::iterator TypesBegin=objs->tmpTypes.begin();
-    list<int>::iterator TypesEnd=objs->tmpTypes.end();
+    if(objs->tmpTypes.size()==0)
+	return;
+    auto TypesBegin=objs->tmpTypes.begin();
+    auto TypesEnd=objs->tmpTypes.end();
     list<PointC::Ptr>::iterator PCsBegin=objs->tmpPCs.begin();
     list<float*>::iterator ProbsBegin=objs->tmpProbs.begin();
 
@@ -146,7 +148,7 @@ void LocalMapping::DetectAndCombine()
        Object* tmpobj=*tmpobjstart;
        auto mapstart=tmpobj->pcmap.begin();    
        auto mapend=tmpobj->pcmap.end();  
-       PointC::Ptr totalpc(new PointC);
+       PointC::Ptr totalpc=boost::make_shared<PointC>();
        cout<<k<<" size "<<tmpobj->pcmap.size()<<endl;
        cout<<"type "<<objs->names[tmpobj->getType()]<<endl;
        while(mapstart!=mapend)
@@ -182,7 +184,7 @@ void LocalMapping::DetectAndCombine()
 	   pcl::transformPointCloud(*pc,*tmppc,ptm*pt);
 	   */
 /*
-	   PointC::Ptr tmppc(new PointC);
+	   PointC::Ptr tmppc=boost::make_shared<PointC>();
 	   pcl::transformPointCloud(*pc,*tmppc,ptm);
 	   *totalpc+=*tmppc;
 	   mapstart++;
@@ -263,7 +265,7 @@ void LocalMapping::Run()
 
 	if(CheckFinish())
 	    break;
-
+	
 	usleep(3000);
     }
 

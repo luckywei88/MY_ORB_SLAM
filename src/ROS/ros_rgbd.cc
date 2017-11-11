@@ -155,8 +155,7 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const senso
 		    sendpc->sendout(mpSLAM->getCurrentFrame().cloud,finalm,time);
 		}
 	    }
-	}
-	
+	}	
 	mpSLAM->getCurrentFrame().deletecloud();
 }
 

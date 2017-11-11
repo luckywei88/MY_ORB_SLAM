@@ -21,20 +21,24 @@ namespace ORB_SLAM2
 	    public:
 		    char** load_name(char *datacfg);
 		    network load_network(char *cfgfile, char *weightfile);
+		    image** load_alphabet(char *labelfile);
 		    void detect_img(network net, image im, float thresh, float hier_thresh, box *boxes, float **probs, float **masks, char **names);
-		    void yolo_load(char *datacfg, char *cfgfile, char *weightfile,  float thresh, float hier_thresh);
+		    void yolo_load(char *datacfg, char *cfgfile, char *weightfile,  char *labelfile, float thresh, float hier_thresh);
 		    void yolo_detect(IplImage* input);
 		    void delet();
+
+		    static image ipl_to_image(IplImage* src);
+		    static image make_empty_image(int w,int h,int c);
+		    static image make_image(int w,int h,int c);
+
 		    box *boxes;
 		    float **probs;
 		    char** names;
+		    image **alphabet;
 		    int total;
 		    int classes;
 		    float thresh;
 	    private:
-		    image ipl_to_image(IplImage* src);
-		    image make_empty_image(int w,int h,int c);
-		    image make_image(int w,int h,int c);
 		    float hier_thresh;
 		    network net;
 		    layer l;

@@ -11,6 +11,7 @@ namespace ORB_SLAM2
 	yolo_data="";
 	yolo_weight="";
 	yolo_cfg="";
+	yolo_label="";
 
 	world="";
 	base="";
@@ -33,6 +34,7 @@ namespace ORB_SLAM2
 	n_private.param("yolo_data",yolo_data,yolo_data);
 	n_private.param("yolo_weight",yolo_weight,yolo_weight);
 	n_private.param("yolo_cfg",yolo_cfg,yolo_cfg);
+	n_private.param("yolo_label",yolo_label,yolo_label);
 
 	n_private.param("world_tf",world,world);
 	n_private.param("base_tf",base,base);
@@ -51,18 +53,19 @@ namespace ORB_SLAM2
 	yolo_data=argv[3];
 	yolo_weight=argv[4];
 	yolo_cfg=argv[5];
+	yolo_label=argv[6];
 
-	world=argv[6];
-	base=argv[7];
-	odom=argv[8];
+	world=argv[7];
+	base=argv[8];
+	odom=argv[9];
 
-	data_dir=argv[9];
-	associate=argv[10];
+	data_dir=argv[10];
+	associate=argv[11];
 
-	string enable=argv[11];
+	string enable=argv[12];
 	if(enable=="true")
 	    enable_ros=true;
-	string gu=argv[12];
+	string gu=argv[13];
 	if(gu=="true")
 	    gui=true;
     }

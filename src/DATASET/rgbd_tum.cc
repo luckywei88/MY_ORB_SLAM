@@ -35,7 +35,8 @@ void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageF
 
 int main(int argc, char **argv)
 {
-    if(argc != 13)
+    cout<<argc<<endl;
+    if(argc !=14)
     {
         cerr << endl << "Usage: ./rgbd_tum path_to_vocabulary path_to_settings path_to_sequence path_to_association type" << endl;
         return 1;
