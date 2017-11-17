@@ -40,7 +40,6 @@ namespace ORB_SLAM2
 	{
 		float *X = im.data;
 		double time=what_time_is_it_now();
-		std::cout<<"lib detect"<<std::endl;
 		network_predict(net, X);
 		printf("Predicted in %f seconds.\n", what_time_is_it_now()-time);
 		get_region_boxes(l, im.w, im.h, net.w, net.h, thresh, probs, boxes, masks, 0, 0, hier_thresh, 1);
@@ -114,9 +113,7 @@ namespace ORB_SLAM2
 			for(int j = 0; j < l.w*l.h*l.n; ++j) 
 				masks[j] =(float*) calloc(l.coords-4, sizeof(float *));
 		}
-		std::cout<<"yolo detect"<<std::endl;
 		detect_img(net,out,thresh,hier_thresh,boxes,probs,masks,names);
-		std::cout<<"finished yolo detect"<<std::endl;
 
 	}
 

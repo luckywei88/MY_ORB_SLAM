@@ -223,7 +223,7 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB1,const cv::Mat &imD1, const
 
 	mImGray = imRGB.clone();
 	cv::Mat imDepth = imD;
-
+	
 	if(mImGray.channels()==3)
 	{
 		if(mbRGB)
@@ -318,7 +318,7 @@ void Tracking::Track()
 				// Local Mapping might have changed some MapPoints tracked in last frame
 				CheckReplacedInLastFrame();
 				firstMatch = TrackReferenceKeyFrame();
-				cout<<"reference key frame "<<firstMatch<<endl;
+			//	cout<<"reference key frame "<<firstMatch<<endl;
 				if(firstMatch>=10)
 					bOK=true;
 				else
@@ -343,7 +343,7 @@ void Tracking::Track()
 			else
 			{
 				firstMatch = Relocalization();
-				cout<<"relocalization "<<firstMatch<<endl;
+			//	cout<<"relocalization "<<firstMatch<<endl;
 				if(firstMatch>=40)
 					bOK=true;
 				else
@@ -1108,6 +1108,7 @@ bool Tracking::NeedNewKeyFrame()
 
 	// Local Mapping accept keyframes?
 	bool bLocalMappingIdle = mpLocalMapper->AcceptKeyFrames();
+//	bool bLocalMappingIdle = true;
 
 	// Stereo & RGB-D: Ratio of close "matches to map"/"total matches"
 	// "total matches = matches to map + visual odometry matches"
@@ -1146,7 +1147,7 @@ bool Tracking::NeedNewKeyFrame()
 		thRefRatio = 0.9f;
 
 	//lucky
-	thRefRatio=0.85f;
+	thRefRatio=0.75f;
 
 	float thMapRatio = 0.35f;
 	if(mnMatchesInliers>300)
@@ -1162,7 +1163,6 @@ bool Tracking::NeedNewKeyFrame()
 	const bool c2 = ((mnMatchesInliers<nRefMatches*thRefRatio|| ratioMap<thMapRatio) && mnMatchesInliers>15);
 
 	if((c1a||c1b||c1c)&&c2)
-		//	if((c1a||c1b||c1c))
 	{
 		// If the mapping accepts keyframes, insert keyframe.
 		// Otherwise send a signal to interrupt BA

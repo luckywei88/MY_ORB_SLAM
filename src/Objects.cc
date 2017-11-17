@@ -48,6 +48,11 @@ namespace ORB_SLAM2
 		keyframedrawer=tkeyframedrawer;
 	}
 
+	list<Object*> Objects::GetAllObjects()
+	{
+		return std::list<Object*>(vector.begin(),vector.end());
+	}
+
 	string Objects::getName(int i)
 	{
 		string name(names[i]);
@@ -69,9 +74,7 @@ namespace ORB_SLAM2
 		cv::Mat rgb=kf->mRGB;
 		cv::Mat depth=kf->mDepth;
 		IplImage* img=new IplImage(rgb);
-		cout<<"start detect"<<endl;
 		yolo->yolo_detect(img);
-		cout<<"stop detect"<<endl;
 
 		classes=yolo->classes;	//类别数量
 		names=yolo->names;	//类别
@@ -82,7 +85,6 @@ namespace ORB_SLAM2
 
 		int w=rgb.cols;
 		int h=rgb.rows;
-		printf("start print result\n");
 		tmpTypes.clear();
 		tmpPCs.clear();
 		tmpProbs.clear();
@@ -145,7 +147,7 @@ namespace ORB_SLAM2
 				if(bot > h-1) bot = h-1;
 
 
-				printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
+			//	printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 				string s(names[clazz]);
 				if(s=="person")
 				{
@@ -277,8 +279,8 @@ namespace ORB_SLAM2
 		Eigen::Matrix4f finalm=icp->getFinalTransformation();
 		cv::Mat finalpose=Converter::toCvMat(finalm);
 		kf->CorrectMapPoint(finalpose);
-		cout<<"correct"<<endl;
-		cout<<finalm<<endl;
+	//	cout<<"correct"<<endl;
+	//	cout<<finalm<<endl;
 		finalm=finalm*ptm;
 		//	finalm=ptm*finalm;
 		finalpose=Converter::toCvMat(finalm);

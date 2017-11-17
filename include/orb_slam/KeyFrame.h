@@ -107,6 +107,7 @@ public:
     int TrackedMapPoints(const int &minObs);
     MapPoint* GetMapPoint(const size_t &idx);
 
+
     // KeyPoint functions
     std::vector<size_t> GetFeaturesInArea(const float &x, const float  &y, const float  &r) const;
     cv::Mat UnprojectStereo(int i);
@@ -132,6 +133,8 @@ public:
     static bool lId(KeyFrame* pKF1, KeyFrame* pKF2){
         return pKF1->mnId<pKF2->mnId;
     }
+    
+	std::vector<MapPoint*> GetMapPoint();
 
     // The following variables are accesed from only 1 thread or never change (no mutex needed).
 public:
@@ -208,6 +211,8 @@ public:
     cv::Mat mRGB;
     cv::Mat mDepth;
     std::set<Object*> KFObjs;
+    cv::Mat Ow;
+    cv::Mat Rwc;
 
     // The following variables need to be accessed trough a mutex to be thread safe.
 protected:
@@ -215,7 +220,6 @@ protected:
     // SE3 Pose and camera center
     cv::Mat Tcw;
     cv::Mat Twc;
-    cv::Mat Ow;
 
     cv::Mat Cw; // Stereo middel point. Only for visualization
 

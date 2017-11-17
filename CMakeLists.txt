@@ -179,6 +179,7 @@ src/Objects.cc
 src/Object.cc
 src/Yolo.cc
 src/KeyFrameDrawer.cc
+src/PointCloudDrawer.cc
 )
 
 link_directories(${MyLib}

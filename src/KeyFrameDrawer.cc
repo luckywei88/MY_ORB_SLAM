@@ -156,7 +156,7 @@ void KeyFrameDrawer::Update(IplImage *img,char** tnames,image** talphabet, int t
 		mIm=Yolo::ipl_to_image(img);
 		types.clear();
 		boxes.clear();
-		for(int i=0;i<type.size();i++)
+		for(size_t i=0;i<type.size();i++)
 		{
 			boxes.push_back(box[4*i]);
 			boxes.push_back(box[4*i+1]);
@@ -165,7 +165,7 @@ void KeyFrameDrawer::Update(IplImage *img,char** tnames,image** talphabet, int t
 			types.push_back(type[i]);	
 		}
 		update=1;
-		cout<<"update finished"<<endl;
+		//cout<<"update finished"<<endl;
 	}
 }
 

@@ -132,7 +132,7 @@ void KeyFrame::SetPose(const cv::Mat &Tcw_)
     Tcw_.copyTo(Tcw);
     cv::Mat Rcw = Tcw.rowRange(0,3).colRange(0,3);
     cv::Mat tcw = Tcw.rowRange(0,3).col(3);
-    cv::Mat Rwc = Rcw.t();
+    Rwc = Rcw.t();
     Ow = -Rwc*tcw;
 
     Twc = cv::Mat::eye(4,4,Tcw.type());
@@ -173,7 +173,7 @@ void KeyFrame::SetPoseByRight(const cv::Mat &TwcR_)
     cv::Mat center = (cv::Mat_<float>(4,1) << mHalfBaseline, 0 , 0, 1);
     Cw = Twc*center;
 
-    cv::Mat Rwc=Twc.rowRange(0,3).colRange(0,3).clone();
+    Rwc=Twc.rowRange(0,3).colRange(0,3).clone();
     Ow=Twc.rowRange(0,3).col(3).clone();
 
     cv::Mat Rcw=Rwc.t();
@@ -776,6 +776,11 @@ float KeyFrame::ComputeSceneMedianDepth(const int q)
     sort(vDepths.begin(),vDepths.end());
 
     return vDepths[(vDepths.size()-1)/q];
+}
+
+std::vector<MapPoint*> KeyFrame::GetMapPoint()
+{
+	return mvpMapPoints;
 }
 
 } //namespace ORB_SLAM

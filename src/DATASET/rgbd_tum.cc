@@ -65,6 +65,7 @@ int main(int argc, char **argv)
     }
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
+
     ORB_SLAM2::System SLAM(con,ORB_SLAM2::System::RGBD);
 
     // Vector for tracking time statistics

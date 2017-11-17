@@ -38,6 +38,7 @@ namespace ORB_SLAM2
 	void computeICP(KeyFrame* kf,set<Object*>& objs);
 	void Reset();
 	void SetKeyFrameDrawer(KeyFrameDrawer* keyframedrawer);
+	std::list<Object*> GetAllObjects();	
 
 	//all object
 	std::list<Object*> vector;

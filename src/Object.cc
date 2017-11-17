@@ -18,7 +18,6 @@ namespace ORB_SLAM2
 	    }
 	}
 	AllPC=boost::make_shared<PointC>();
-	cout<<"start "<<endl;
 	*AllPC+=*pc;
 	kdtree=new pcl::KdTreeFLANN<PointT>();
 	kdtree->setInputCloud(AllPC);
@@ -68,8 +67,6 @@ namespace ORB_SLAM2
 		
 		    int k=1;
 		    size_t size=pc->size();
-		    cout<<" pc "<<pc->size()<<endl;
-		    cout<<"all pc "<<AllPC->size()<<endl;
 		    std::vector<int> IdxVector(k);
 		    std::vector<float> SDisVector(k);
 		    size_t confirm=0;
@@ -87,11 +84,12 @@ namespace ORB_SLAM2
 				    if(dis<=0.02)
 					    confirm++;
 			    }
-			    }
-			 
+		    }
+		/*	 
 		    cout<<"confirm "<<confirm<<endl;
 		    cout<<"find "<<find<<endl;
 		    cout<<"score "<<(double)confirm/(double)size<<endl;
+		*/
 		    if(confirm*2>=size)
 			    return true;
 		

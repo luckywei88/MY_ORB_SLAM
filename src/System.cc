@@ -119,6 +119,7 @@ System::System(AllConfig* config, const eSensor sensor)
     mpFrameDrawer = new FrameDrawer(mpMap);
     mpKeyFrameDrawer = new KeyFrameDrawer();
     mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);
+    mpPointCloudDrawer = new PointCloudDrawer(objs, strSettingsFile);
 
     //Initialize the Tracking thread
     //(it will live in the main thread of execution, the one that called this constructor)
@@ -132,13 +133,15 @@ System::System(AllConfig* config, const eSensor sensor)
     //Initialize the Loop Closing thread and launch
     mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR);
     mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
-
     //Initialize the Viewer thread and launch
-    mpViewer = new Viewer(this, mpFrameDrawer, mpKeyFrameDrawer,mpMapDrawer, mpTracker,strSettingsFile);
+    mpViewer = new Viewer(this, mpFrameDrawer, mpKeyFrameDrawer, mpPointCloudDrawer, mpMapDrawer, mpTracker,strSettingsFile);
+    
+    objs->SetKeyFrameDrawer(mpKeyFrameDrawer);
     if(gui)
 	mptViewer = new thread(&Viewer::Run, mpViewer);
+     
 
-    objs->SetKeyFrameDrawer(mpKeyFrameDrawer);
+
 
     mpTracker->SetViewer(mpViewer);
 
@@ -147,12 +150,14 @@ System::System(AllConfig* config, const eSensor sensor)
     mpTracker->SetLoopClosing(mpLoopCloser);
     //mpTracker->SetType(type);
 
+
     mpLocalMapper->SetTracker(mpTracker);
     mpLocalMapper->SetLoopCloser(mpLoopCloser);
     mpLocalMapper->SetObjects(objs);
 
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
+
     if(enable)
     {
 	Send* sendpc=new Send(world,base,odom);

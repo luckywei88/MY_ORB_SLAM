@@ -30,6 +30,7 @@
 #include "FrameDrawer.h"
 #include "KeyFrameDrawer.h"
 #include "MapDrawer.h"
+#include "PointCloudDrawer.h"
 #include "Map.h"
 #include "LocalMapping.h"
 #include "LoopClosing.h"
@@ -49,6 +50,8 @@ namespace ORB_SLAM2
 class Viewer;
 class FrameDrawer;
 class KeyFrameDrawer;
+class PointCloudDrawer;
+class MapDrawer;
 class Map;
 class Tracking;
 class LocalMapping;
@@ -160,6 +163,7 @@ private:
 
     FrameDrawer* mpFrameDrawer;
     KeyFrameDrawer* mpKeyFrameDrawer;
+    PointCloudDrawer* mpPointCloudDrawer;
     MapDrawer* mpMapDrawer;
 
     // System threads: Local Mapping, Loop Closing, Viewer.
