@@ -317,33 +317,46 @@ void Tracking::Track()
 			{
 				// Local Mapping might have changed some MapPoints tracked in last frame
 				CheckReplacedInLastFrame();
+
+/*
 				firstMatch = TrackReferenceKeyFrame();
 			//	cout<<"reference key frame "<<firstMatch<<endl;
 				if(firstMatch>=10)
 					bOK=true;
 				else
 					bOK=false;
+*/
 
-				/*
-				   if(mVelocity.empty() || mCurrentFrame.mnId<mnLastRelocFrameId+2)
-				   {
-				   bOK = TrackReferenceKeyFrame();
-				   }
-				   else
-				   {
-				   bOK = TrackWithMotionModel();
-				   if(!bOK)
-				   {
-				   bOK = TrackReferenceKeyFrame();
+				if(mVelocity.empty() || mCurrentFrame.mnId<mnLastRelocFrameId+2)
+				{
+					//bOK = TrackReferenceKeyFrame();
+					firstMatch = TrackReferenceKeyFrame();
+					if(firstMatch>=10)
+						bOK=true;
+					else
+						bOK=false;
+				}
+				else
+				{
+					bOK = TrackWithMotionModel();
+					firstMatch=15;
+					if(!bOK)
+					{
+						//bOK = TrackReferenceKeyFrame();
+						firstMatch = TrackReferenceKeyFrame();
+						if(firstMatch>=10)
+							bOK=true;
+						else
+							bOK=false;
 
-				   }
-				   }
-				 */
+					}
+				}
+
 			}
 			else
 			{
 				firstMatch = Relocalization();
-			//	cout<<"relocalization "<<firstMatch<<endl;
+				//	cout<<"relocalization "<<firstMatch<<endl;
 				if(firstMatch>=40)
 					bOK=true;
 				else
@@ -1108,7 +1121,7 @@ bool Tracking::NeedNewKeyFrame()
 
 	// Local Mapping accept keyframes?
 	bool bLocalMappingIdle = mpLocalMapper->AcceptKeyFrames();
-//	bool bLocalMappingIdle = true;
+	//	bool bLocalMappingIdle = true;
 
 	// Stereo & RGB-D: Ratio of close "matches to map"/"total matches"
 	// "total matches = matches to map + visual odometry matches"
@@ -1147,7 +1160,7 @@ bool Tracking::NeedNewKeyFrame()
 		thRefRatio = 0.9f;
 
 	//lucky
-	thRefRatio=0.75f;
+	//	thRefRatio=0.85f;
 
 	float thMapRatio = 0.35f;
 	if(mnMatchesInliers>300)
