@@ -10,12 +10,12 @@ namespace ORB_SLAM2
 		return get_labels(name_list);
 	}
 
-	network Yolo::load_network(char *cfgfile,char *weightfile)
+	network* Yolo::load_network(char *cfgfile,char *weightfile)
 	{
-		network net=parse_network_cfg(cfgfile);
+		network* net=parse_network_cfg(cfgfile);
 		if(weightfile)
-			load_weights(&net,weightfile);
-		set_batch_network(&net,1);
+			load_weights(net,weightfile);
+		set_batch_network(net,1);
 		return net;
 	}
 
@@ -36,14 +36,14 @@ namespace ORB_SLAM2
 
 	}	
 
-	void Yolo::detect_img(network net, image im, float thresh, float hier_thresh, box *boxes, float **probs, float **masks, char **names)
+	void Yolo::detect_img(network* net, image im, float thresh, float hier_thresh, box *boxes, float **probs, float **masks, char **names)
 	{
 		float *X = im.data;
 		double time=what_time_is_it_now();
 		network_predict(net, X);
 		printf("Predicted in %f seconds.\n", what_time_is_it_now()-time);
-		get_region_boxes(l, im.w, im.h, net.w, net.h, thresh, probs, boxes, masks, 0, 0, hier_thresh, 1);
-		do_nms_obj(boxes,probs,l.w*l.h*l.n,l.classes,0.3);	
+		get_region_boxes(l, im.w, im.h, net->w, net->h, thresh, probs, boxes, masks, 0, 0, hier_thresh, 1);
+		do_nms_sort(boxes,probs,total,l.classes,0.3);	
 	}
 
 
@@ -99,7 +99,7 @@ namespace ORB_SLAM2
 	void Yolo::yolo_detect(IplImage* input)
 	{
 		image out=ipl_to_image(input);
-		l=net.layers[net.n-1];
+		l=net->layers[net->n-1];
 		total=l.w*l.h*l.n;
 		classes=l.classes;
 		boxes = (box*)calloc(total, sizeof(box));
@@ -109,8 +109,8 @@ namespace ORB_SLAM2
 
 		float **masks = 0;
 		if (l.coords > 4){
-			masks = (float**)calloc(l.w*l.h*l.n, sizeof(float*));
-			for(int j = 0; j < l.w*l.h*l.n; ++j) 
+			masks = (float**)calloc(total, sizeof(float*));
+			for(int j = 0; j < total; ++j) 
 				masks[j] =(float*) calloc(l.coords-4, sizeof(float *));
 		}
 		detect_img(net,out,thresh,hier_thresh,boxes,probs,masks,names);

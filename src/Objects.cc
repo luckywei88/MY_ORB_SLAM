@@ -132,6 +132,7 @@ namespace ORB_SLAM2
 		{
 			int clazz = max_index(probs[i],classes);
 			float prob=probs[i][clazz];
+			
 
 			if(prob>yolo->thresh)
 			{
@@ -147,9 +148,9 @@ namespace ORB_SLAM2
 				if(bot > h-1) bot = h-1;
 
 
-			//	printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
+				printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 				string s(names[clazz]);
-				if(s=="person")
+				if(s=="personl")
 				{
 					//delete unstable feature
 					kf->DeleteFeature(left,right,top,bot);
