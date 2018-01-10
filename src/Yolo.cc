@@ -10,11 +10,20 @@ namespace ORB_SLAM2
 		return get_labels(name_list);
 	}
 
-	network* Yolo::load_network(char *cfgfile,char *weightfile)
+	network* Yolo::load_network(char *cfgfile,char *weightfile,int clear)
 	{
+		
 		network* net=parse_network_cfg(cfgfile);
-		if(weightfile)
+		l=net->layers[15];
+		total=l.w*l.h*l.n;
+		if(weightfile && weightfile[0]!=0)
+		{
 			load_weights(net,weightfile);
+		}
+		if(clear)
+		{
+			(*net->seen)=0;
+		}
 		set_batch_network(net,1);
 		return net;
 	}
@@ -50,8 +59,11 @@ namespace ORB_SLAM2
 	void Yolo::yolo_load(char *datacfg, char *cfgfile, char *weightfile, char *labelfile, float mthresh, float mhier_thresh)
 	{
 		names=load_name(datacfg);
-		net=load_network(cfgfile,weightfile);
 		alphabet=load_alphabet(labelfile);
+		net=load_network(cfgfile,weightfile,0);
+		l=net->layers[net->n-1];
+		total=l.w*l.h*l.n;
+		classes=l.classes;
 		thresh=mthresh;
 		hier_thresh=mhier_thresh;
 	}
@@ -99,9 +111,6 @@ namespace ORB_SLAM2
 	void Yolo::yolo_detect(IplImage* input)
 	{
 		image out=ipl_to_image(input);
-		l=net->layers[net->n-1];
-		total=l.w*l.h*l.n;
-		classes=l.classes;
 		boxes = (box*)calloc(total, sizeof(box));
 		probs = (float**)calloc(total, sizeof(float *));
 		for(int j = 0; j < total; ++j) 

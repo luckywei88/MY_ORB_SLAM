@@ -46,72 +46,30 @@ find_package(OpenCV 2.4.3 REQUIRED)
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(PCL 1.7 REQUIRED)
+find_package(CUDA  REQUIRED)
 
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+set(
+    CUDA_NVCC_FLAGS
+    ${CUDA_NVCC_FLAGS};
+    -O3
+    #-gencode arch=compute_20,code=[sm_20,sm_21] 666 CHECK THIS DEPEND ON THE PLATFORM
+    -gencode arch=compute_30,code=sm_30
+    -gencode arch=compute_35,code=sm_35
+    -gencode arch=compute_50,code=[sm_50,compute_50]
+    -gencode arch=compute_52,code=[sm_52,compute_52]
+    -gencode arch=compute_61,code=sm_61
+    -gencode arch=compute_62,code=sm_62
+ 
+)
+add_definitions(-DGPU)
+add_definitions(-DOPENCV)
+find_package(Boost REQUIRED COMPONENTS thread)
 
-################################################
-## Declare ROS messages, services and actions ##
-################################################
+set(DARKNET_PATH "/home/lucky/MyLib/darknet")
+add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
-## To declare and build messages, services or actions from within this
-## package, follow these steps:
-## * Let MSG_DEP_SET be the set of packages whose message types you use in
-##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
-## * In the file package.xml:
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependencies might have been
-##     pulled in transitively but can be declared for certainty nonetheless:
-##     * add a build_depend tag for "message_generation"
-##     * add a run_depend tag for "message_runtime"
-## * In this file (CMakeLists.txt):
-##   * add "message_generation" and every package in MSG_DEP_SET to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * add "message_runtime" and every package in MSG_DEP_SET to
-##     catkin_package(CATKIN_DEPENDS ...)
-##   * uncomment the add_*_files sections below as needed
-##     and list every .msg/.srv/.action file to be processed
-##   * uncomment the generate_messages entry below
-##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
+SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
-
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   sensor_msgs#   std_msgs
-# )
-
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES orb_slam
@@ -128,12 +86,16 @@ SET(MyLib /home/lucky/MyLib)
 # include_directories(include)
 include_directories(
   include/orb_slam
-  ${MyLib} 
+  ${MyLib}
+  ${DARKNET_PATH}/src
+  ${DARKNET_PATH}/include 
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
   ${Pangolin_INCLUDE_DIRS}
+  ${CUDA_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}
 )
 
@@ -142,18 +104,77 @@ include_directories(
 #   src/${PROJECT_NAME}/orb_slam.cpp
 # )
 
+message("/////////////////////////////////")
+message(${CUDA_LIBRARIES})
+message(${CUDA_INCLUDE_DIRS})
+
+
+link_directories(
+	${MyLib}
+	/usr/local/cuda-8.0/lib64	
+)
+
+ cuda_add_library(darknet_c
+    ${DARKNET_PATH}/src/activation_layer.c        ${DARKNET_PATH}/src/im2col.c
+    ${DARKNET_PATH}/src/activations.c             ${DARKNET_PATH}/src/image.c
+    ${DARKNET_PATH}/src/avgpool_layer.c           ${DARKNET_PATH}/src/layer.c
+    ${DARKNET_PATH}/src/batchnorm_layer.c         ${DARKNET_PATH}/src/list.c
+    ${DARKNET_PATH}/src/blas.c                    ${DARKNET_PATH}/src/local_layer.c
+    ${DARKNET_PATH}/src/box.c                     ${DARKNET_PATH}/src/lstm_layer.c
+    ${DARKNET_PATH}/src/col2im.c                  ${DARKNET_PATH}/src/matrix.c
+    ${DARKNET_PATH}/src/maxpool_layer.c
+    ${DARKNET_PATH}/src/connected_layer.c         ${DARKNET_PATH}/src/network.c
+    ${DARKNET_PATH}/src/convolutional_layer.c     ${DARKNET_PATH}/src/normalization_layer.c
+    ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/option_list.c
+    ${DARKNET_PATH}/src/crnn_layer.c              ${DARKNET_PATH}/src/parser.c
+    ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/region_layer.c
+    ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/reorg_layer.c
+    ${DARKNET_PATH}/src/data.c                    ${DARKNET_PATH}/src/rnn_layer.c
+    ${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/route_layer.c
+    ${DARKNET_PATH}/src/demo.c                    ${DARKNET_PATH}/src/shortcut_layer.c
+    ${DARKNET_PATH}/src/detection_layer.c         ${DARKNET_PATH}/src/softmax_layer.c
+    ${DARKNET_PATH}/src/dropout_layer.c           ${DARKNET_PATH}/src/tree.c
+    ${DARKNET_PATH}/src/gemm.c                    ${DARKNET_PATH}/src/utils.c
+    ${DARKNET_PATH}/src/gru_layer.c
+
+    ${DARKNET_PATH}/src/activation_kernels.cu     ${DARKNET_PATH}/src/deconvolutional_kernels.cu
+    ${DARKNET_PATH}/src/avgpool_layer_kernels.cu  ${DARKNET_PATH}/src/dropout_layer_kernels.cu
+    ${DARKNET_PATH}/src/blas_kernels.cu           ${DARKNET_PATH}/src/im2col_kernels.cu
+    ${DARKNET_PATH}/src/col2im_kernels.cu         ${DARKNET_PATH}/src/maxpool_layer_kernels.cu
+    ${DARKNET_PATH}/src/convolutional_kernels.cu  
+    ${DARKNET_PATH}/src/crop_layer_kernels.cu
+  )
+
+ target_link_libraries(darknet_c
+    m
+    pthread
+    stdc++
+    cuda
+    cudart
+    cublas
+    curand
+    ${Boost_LIBRARIES}
+  )
+
+
 set(LIBS
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${catkin_LIBRARIES}
 ${PCL_LIBRARIES}
 ${Pangolin_LIBRARIES}
+${CUDA_LIBRARIES}
 ${MyLib}/darknet/libdarknet.so
 ${MyLib}/DBoW2/lib/libDBoW2.so
 ${MyLib}/g2o/lib/libg2o.so
+darknet_c
 )
 
-add_library(${PROJECT_NAME} SHARED
+
+
+
+
+cuda_add_library(${PROJECT_NAME} SHARED
 src/System.cc
 src/Tracking.cc
 src/LocalMapping.cc
@@ -182,8 +203,7 @@ src/KeyFrameDrawer.cc
 src/PointCloudDrawer.cc
 )
 
-link_directories(${MyLib}
-)
+
 
 target_link_libraries(${PROJECT_NAME}
 ${LIBS}
@@ -203,59 +223,3 @@ target_link_libraries(Stereo ${PROJECT_NAME} ${LIBS})
 add_executable(RGBD src/ROS/ros_rgbd.cc)
 target_link_libraries(RGBD ${PROJECT_NAME} ${LIBS})
 
-## Add cmake target dependencies of the executable/library
-## as an example, message headers may need to be generated before nodes
-# add_dependencies(orb_slam_node orb_slam_generate_messages_cpp)
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(orb_slam_node
-#   ${catkin_LIBRARIES}
-# )
-
-#############
-## Install ##
-#############
-
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark executables and/or libraries for installation
-# install(TARGETS orb_slam orb_slam_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_orb_slam.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)

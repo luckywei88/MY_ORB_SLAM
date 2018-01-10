@@ -16,7 +16,7 @@ namespace ORB_SLAM2
 				config,
 				weight,
 				label,	
-				0.24,
+				0.35,
 				0.5);
 		//    cpf=new CPF();
 		vg=new pcl::VoxelGrid<PointT>();
@@ -132,7 +132,7 @@ namespace ORB_SLAM2
 		{
 			int clazz = max_index(probs[i],classes);
 			float prob=probs[i][clazz];
-			
+						
 
 			if(prob>yolo->thresh)
 			{
@@ -150,7 +150,7 @@ namespace ORB_SLAM2
 
 				printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 				string s(names[clazz]);
-				if(s=="personl")
+				if(s=="person")
 				{
 					//delete unstable feature
 					kf->DeleteFeature(left,right,top,bot);
