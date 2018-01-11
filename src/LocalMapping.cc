@@ -114,12 +114,13 @@ void LocalMapping::DetectAndCombine()
 	{
 	    Object* obj=*tmpStart;
 //            cout<<"compare "<<objs->getName(obj->getType())<<endl;
-	    if(obj->compare(type,pc))
+	   /* if(obj->compare(type,pc))
 	    {
 		obj->add(mpCurrentKeyFrame,pc,prob);
 		mpCurrentKeyFrame->KFObjs.insert(obj);
 		break;
 	    }
+*/
 	    tmpStart++;
 //            cout<<"------"<<endl;
 	}

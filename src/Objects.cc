@@ -16,9 +16,9 @@ namespace ORB_SLAM2
 				config,
 				weight,
 				label,	
-				0.35,
+				0.25,
 				0.5);
-		//    cpf=new CPF();
+		//    cpf=new CPF();  0.35
 		vg=new pcl::VoxelGrid<PointT>();
 		vg->setLeafSize(0.005,0.005,0.005);
 		icp=new pcl::IterativeClosestPoint<PointT,PointT>();
@@ -150,7 +150,7 @@ namespace ORB_SLAM2
 
 				printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 				string s(names[clazz]);
-				if(s=="person")
+				if(s=="personl")
 				{
 					//delete unstable feature
 					kf->DeleteFeature(left,right,top,bot);

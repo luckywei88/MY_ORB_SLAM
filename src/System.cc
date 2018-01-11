@@ -230,7 +230,7 @@ void System::Init(const string &strVocFile, const string &strSettingsFile, int t
 
     //Initialize the Loop Closing thread and launch
     mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR);
-    mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
+//    mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
 
     //Initialize the Viewer thread and launch
     mpViewer = new Viewer(this, mpFrameDrawer,  mpMapDrawer,mpTracker,strSettingsFile);
