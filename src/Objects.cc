@@ -16,7 +16,7 @@ namespace ORB_SLAM2
 				config,
 				weight,
 				label,	
-				0.25,
+				0.35,
 				0.5);
 		//    cpf=new CPF();  0.35
 		vg=new pcl::VoxelGrid<PointT>();
@@ -94,7 +94,7 @@ namespace ORB_SLAM2
 		float cy=kf->cy;
 
 		//vector<int> tmpbox;
-		std::vector<int> tmpbox;
+		std::vector<int> tmpbox,tmpbox1,tmpTypes1;
 
 		//pointcloud
 		/*PointC* cloud=new PointC();
@@ -150,7 +150,8 @@ namespace ORB_SLAM2
 
 				printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 				string s(names[clazz]);
-				if(s=="personl")
+			
+				if(s=="person")
 				{
 					//delete unstable feature
 					kf->DeleteFeature(left,right,top,bot);
@@ -158,8 +159,8 @@ namespace ORB_SLAM2
 				}
 				else
 				{
-					//segmentation
 					PointC::Ptr cloud=boost::make_shared<PointC>();
+					//segmentation
 					for(int n=top;n<bot+1;n++)
 					{
 						for(int j=left;j<right+1;j++)
@@ -212,12 +213,17 @@ namespace ORB_SLAM2
 						tmpProb[j]=probs[i][j]*100.0;
 					}
 					tmpProbs.push_back(tmpProb);
+
 				}
+				tmpbox1.push_back(left);
+				tmpbox1.push_back(right);
+				tmpbox1.push_back(top);
+				tmpbox1.push_back(bot);
+				tmpTypes1.push_back(clazz);
+
 			}
 		}
-
-
-		keyframedrawer->Update(img,names, yolo->alphabet,classes,tmpbox,tmpTypes);
+		keyframedrawer->Update(img,names, yolo->alphabet,classes,tmpbox1,tmpTypes1);
 		yolo->delet();
 	}
 
@@ -280,8 +286,8 @@ namespace ORB_SLAM2
 		Eigen::Matrix4f finalm=icp->getFinalTransformation();
 		cv::Mat finalpose=Converter::toCvMat(finalm);
 		kf->CorrectMapPoint(finalpose);
-	//	cout<<"correct"<<endl;
-	//	cout<<finalm<<endl;
+		//	cout<<"correct"<<endl;
+		//	cout<<finalm<<endl;
 		finalm=finalm*ptm;
 		//	finalm=ptm*finalm;
 		finalpose=Converter::toCvMat(finalm);

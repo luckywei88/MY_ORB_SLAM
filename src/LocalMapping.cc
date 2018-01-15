@@ -50,6 +50,11 @@ void LocalMapping::SetObjects(Objects *mobjs)
     objs=mobjs;
 }
 
+void LocalMapping::SetSender(Send* send)
+{
+    mSend=send;
+}
+
 void LocalMapping::DetectAndCombine()
 {
 
@@ -105,7 +110,6 @@ void LocalMapping::DetectAndCombine()
 	PointC::Ptr pc=*PCsBegin;
 	float* prob=*ProbsBegin;
     	set<Object*>::iterator tmpStart=ObjsIt;
-//	cout<<objs->getName(type)<<endl;
 /*
 	if(pc->size()>0)	
 		mpCurrentKeyFrame->WriteCloud(pc,100+p);
@@ -114,13 +118,12 @@ void LocalMapping::DetectAndCombine()
 	{
 	    Object* obj=*tmpStart;
 //            cout<<"compare "<<objs->getName(obj->getType())<<endl;
-	   /* if(obj->compare(type,pc))
+	    if(obj->compare(type,pc))
 	    {
 		obj->add(mpCurrentKeyFrame,pc,prob);
 		mpCurrentKeyFrame->KFObjs.insert(obj);
 		break;
 	    }
-*/
 	    tmpStart++;
 //            cout<<"------"<<endl;
 	}

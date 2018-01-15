@@ -60,10 +60,16 @@ namespace ORB_SLAM2
 
     bool Object::compare(int type, PointC::Ptr pc)
     {
-/*	
 	    if(type==clazz)
-	    {
-*/
+		    return true;
+	    else
+	    	   return false;
+
+    }
+
+/*
+    bool Object::compare(int type, PointC::Ptr pc)
+    {
 		
 		    int k=1;
 		    size_t size=pc->size();
@@ -77,27 +83,18 @@ namespace ORB_SLAM2
 			    if(kdtree->nearestKSearch(pc->at(i),k,IdxVector,SDisVector))
 			    {
 				    find++;
-				    //PointT pt=pc->at(i);
-				    //cout<<"pt "<<pt.x<<" "<<pt.y<<" "<<pt.z<<endl;
 				    float dis=SDisVector[0];
-				    //cout<<"dis "<<dis<<endl;
 				    if(dis<=0.02)
 					    confirm++;
 			    }
 		    }
-		/*	 
-		    cout<<"confirm "<<confirm<<endl;
-		    cout<<"find "<<find<<endl;
-		    cout<<"score "<<(double)confirm/(double)size<<endl;
-		*/
 		    if(confirm*2>=size)
 			    return true;
 		
-//		    return true;
-//	    }
-	    	   return false;
+	    	    return false;
 
     }
+*/
 
     float Object::getProb()
     {

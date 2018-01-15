@@ -160,9 +160,10 @@ System::System(AllConfig* config, const eSensor sensor)
 
     if(enable)
     {
+	cout<<"enter send"<<endl;
 	Send* sendpc=new Send(world,base,odom);
-	mpLoopCloser->SetSender(sendpc);
-//	mpLocalMapper->setSender(sendpc);
+	//mpLoopCloser->SetSender(sendpc);
+	mpLocalMapper->SetSender(sendpc);
     }
 }
 

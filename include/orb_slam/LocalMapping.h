@@ -24,6 +24,7 @@
 #include "KeyFrame.h"
 #include "Map.h"
 #include "LoopClosing.h"
+#include "Send.h"
 #include "Tracking.h"
 #include "KeyFrameDatabase.h"
 #include "Objects.h"
@@ -88,6 +89,8 @@ public:
 		return mlNewKeyFrames.size();
 	}
 
+	void SetSender(Send* send);
+
 protected:
 
 	bool CheckNewKeyFrames();
@@ -140,6 +143,7 @@ protected:
 	std::mutex mMutexAccept;
 
 	Objects* objs;
+	Send* mSend;
 };
 
 } //namespace ORB_SLAM
