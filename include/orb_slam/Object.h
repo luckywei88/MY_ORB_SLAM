@@ -5,6 +5,7 @@
 #include <map>
 #include <pcl/point_types.h>
 #include <pcl/common/io.h>
+#include <pcl/common/transforms.h>
 #include <pcl/common/distances.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/io/pcd_io.h>

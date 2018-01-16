@@ -33,6 +33,7 @@ LocalMapping::LocalMapping(Map *pMap, const float bMonocular):
     mbMonocular(bMonocular), mbResetRequested(false), mbFinishRequested(false), mbFinished(true), mpMap(pMap),
     mbAbortBA(false), mbStopped(false), mbStopRequested(false), mbNotStop(false), mbAcceptKeyFrames(true)
 {
+    mSend=NULL;
 }
 
 void LocalMapping::SetLoopCloser(LoopClosing* pLoopCloser)
@@ -60,19 +61,26 @@ void LocalMapping::DetectAndCombine()
 
 //    cout<<"------------"<<mpCurrentKeyFrame->mnId<<" one frame---------------"<<endl;
     
-
     //detect objs
     objs->detection(mpCurrentKeyFrame);
+
     //get Detect Result
- //   cout<<"Type size "<<objs->tmpTypes.size()<<endl;
     if(objs->tmpTypes.size()==0)
 	return;
     auto TypesBegin=objs->tmpTypes.begin();
     auto TypesEnd=objs->tmpTypes.end();
     list<PointC::Ptr>::iterator PCsBegin=objs->tmpPCs.begin();
     list<float*>::iterator ProbsBegin=objs->tmpProbs.begin();
-
-
+/*
+    PointC::Ptr tmptotalpc=boost::make_shared<PointC>();
+    while(PCsBegin!=objs->tmpPCs.end())
+    {
+	*tmptotalpc+=*(*PCsBegin);
+	PCsBegin++;	
+    }
+	   mSend->sendout(tmptotalpc, mpCurrentKeyFrame->GetPoseRight()); 
+*/
+    PCsBegin=objs->tmpPCs.begin();
     //find Candidates
     int nn=10;
     const vector<KeyFrame*> vpNeighKFs = mpCurrentKeyFrame->GetBestCovisibilityKeyFrames(nn);
@@ -91,8 +99,6 @@ void LocalMapping::DetectAndCombine()
 	    objStart++;
 	}
     }
- 
-//    cout<<"Candidate Objs "<<NearObjs.size()<<endl;
 
     set<Object*>::iterator ObjsIt =NearObjs.begin();
     set<Object*>::iterator ObjsEnd=NearObjs.end();
@@ -141,190 +147,105 @@ void LocalMapping::DetectAndCombine()
 //	cout<<"---------------------"<<endl;
 
     }
- //   cout<<"mpCurrentKeyFrame Objects "<<mpCurrentKeyFrame->KFObjs.size()<<endl;
- //   cout<<"Total Objs "<<objs->vector.size()<<endl;
+    cout<<"detect complete"<<endl;
 
-/*
-   list<Object*>::iterator tmpobjstart=objs->vector.begin(); 
-   list<Object*>::iterator tmpobjend=objs->vector.end();
-   int k=0;
-   PointC* allpc=new PointC();
-   while(tmpobjstart!=tmpobjend)
+
+
+   if(mSend!=NULL)
    {
-       Object* tmpobj=*tmpobjstart;
-       auto mapstart=tmpobj->pcmap.begin();    
-       auto mapend=tmpobj->pcmap.end();  
-       PointC::Ptr totalpc=boost::make_shared<PointC>();
-       cout<<k<<" size "<<tmpobj->pcmap.size()<<endl;
-       cout<<"type "<<objs->names[tmpobj->getType()]<<endl;
-       while(mapstart!=mapend)
-       {
-	   KeyFrame* kf=mapstart->first;
-	   PointC::Ptr pc=mapstart->second;
-*/
-	   /*
-	   cv::Mat pose;
-	   kf->GetPose().copyTo(pose);
-	   cv::Mat Rwc(3,3,CV_32F);
-	   cv::Mat twc(3,1,CV_32F);
-	   Rwc = pose.rowRange(0,3).colRange(0,3).t();
-	   twc = -Rwc*pose.rowRange(0,3).col(3);
-	   */
-/*
-	   cv::Mat pose=kf->GetPoseRight();
-	   Eigen::Matrix4f ptm(4,4);
-	   ptm<<
-	       pose.at<float>(0,0),pose.at<float>(0,1),pose.at<float>(0,2),pose.at<float>(0,3),
-	       pose.at<float>(1,0),pose.at<float>(1,1),pose.at<float>(1,2),pose.at<float>(1,3),
-	       pose.at<float>(2,0),pose.at<float>(2,1),pose.at<float>(2,2),pose.at<float>(2,3),
-	       0,0,0,1;
-*/
-	  /* 
-	   Eigen::Matrix4f pt(4,4);
-	   pt<<
-	       0, 0, 1, 0,
-	       -1, 0, 0, -0.05,
-	       0,-1, 0, 0,
-	       0, 0, 0, 1;
-	       
-	   pcl::transformPointCloud(*pc,*tmppc,ptm*pt);
-	   */
-/*
-	   PointC::Ptr tmppc=boost::make_shared<PointC>();
-	   pcl::transformPointCloud(*pc,*tmppc,ptm);
-	   *totalpc+=*tmppc;
-	   mapstart++;
-       }
-       if(totalpc->size()>0)
-	   mpCurrentKeyFrame->WriteCloud(totalpc,k);
-       tmpobjstart++;
-       k++;
-       *allpc+=*totalpc;
+	   list<Object*>::iterator tmpobjstart=objs->vector.begin(); 
+	   list<Object*>::iterator tmpobjend=objs->vector.end();
+	   PointC::Ptr totalpc=boost::make_shared<PointC>();
+	   while(tmpobjstart!=tmpobjend)
+	   {
+		   Object* tmpobj=*tmpobjstart;
+		   PointC::Ptr pc=tmpobj->GetPC();
+		   *totalpc+=*pc;
+		   tmpobjstart++;
+	   }
+	   mSend->sendout(totalpc, mpCurrentKeyFrame->GetPoseRight()); 
    }
-   if(allpc->size()>0)
-   	mpCurrentKeyFrame->WriteCloud(allpc,99);
-   delete allpc;
-*/
+
 }
 
 
 void LocalMapping::Run()
 {
 
-    mbFinished = false;
+	mbFinished = false;
 
-    while(1)
-    {
-	// Tracking will see that Local Mapping is busy
-	SetAcceptKeyFrames(false);
-
-	// Check if there are keyframes in the queue
-	if(CheckNewKeyFrames())
+	while(1)
 	{
-// BoW conversion and insertion in Map
+		// Tracking will see that Local Mapping is busy
+		SetAcceptKeyFrames(false);
 
-	    ProcessNewKeyFrame();
-	    // Check recent MapPoints
-	    MapPointCulling();
-	    // Triangulate new MapPoints
-	    //	    CreateNewMapPoints();
-
-	    //	    detect and find Objects
-/*
-	    auto mvp=mpCurrentKeyFrame->GetMapPoint();
-	    MapPoint* tmpmp1=mvp[0];
-	    cout<<tmpmp1->GetWorldPos()<<endl;
-	    cout<<"start"<<endl;	
-	    cv::Mat rwc1=mpCurrentKeyFrame->Rwc;
-	    cv::Mat ow1=mpCurrentKeyFrame->Ow;              
-	    cout<<"rwc "<<rwc1<<endl;          
-	    cout<<"ow "<<ow1<<endl;          
-*/
-	    DetectAndCombine();
-
-
-	    if(!CheckNewKeyFrames())
-	    {
-		// Find more matches in neighbor keyframes and fuse point duplications
-		SearchInNeighbors();
-	    }
-
-	    mbAbortBA = false;
-	   
-	    if(!CheckNewKeyFrames() && !stopRequested())
-	    {
-		    // Local BA
-		    if(mpMap->KeyFramesInMap()>2)
-			    Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame,&mbAbortBA, mpMap);
-
-		    // Check redundant local Keyframes
-		    KeyFrameCulling();
-	    }
-/*
-	    auto mvk=mpCurrentKeyFrame->mvKeys;
-	    cout<<"size"<<endl;
-	    cout<<mvp.size()<<endl;
-	    cout<<mvk.size()<<endl;
-	    MapPoint* tmpmp=mvp[0];
-	    cout<<tmpmp->GetWorldPos()<<endl;
-	    cout<<"show "<<endl;
-	    float fxinv=mpCurrentKeyFrame->invfx;
-	    float fyinv=mpCurrentKeyFrame->invfy;
-	    float cx=mpCurrentKeyFrame->cx;
-	    float cy=mpCurrentKeyFrame->cy;
-	    cv::Mat depth=mpCurrentKeyFrame->mDepth;
-
-	    float u=mvk[0].pt.x;     
-	    float v=mvk[0].pt.y;     
-	    float z=depth.at<float>(v,u);
-	    float y=(v-cy)*z*fyinv;
-	    float x=(u-cx)*z*fxinv;
-	    cout<<"u "<<u<<" v "<<v<<endl;
-	    cout<<"x "<<x<<" y "<<y<<" z "<<z<<endl;
-	    cv::Mat Twc=mpCurrentKeyFrame->GetPoseInverse();
-	    cv::Mat rwc=Twc.rowRange(0,3).colRange(0,3);
-	    cv::Mat ow=Twc.rowRange(0,3).col(3);    
-	    cout<<"rwc "<<rwc<<endl;          
-	    cout<<"ow "<<ow<<endl;   
-	    cv::Mat x3Dc=(cv::Mat_<float>(3,1)<<x,y,z);     
-	    x3Dc=rwc*x3Dc+ow;
-	    cout<<x3Dc<<endl;
-*/
-
-	    mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
-	}
-	else if(Stop())
-	{
-		// Safe area to stop
-		while(isStopped() && !CheckFinish())
+		// Check if there are keyframes in the queue
+		if(CheckNewKeyFrames())
 		{
-			usleep(3000);
+			// BoW conversion and insertion in Map
+
+			ProcessNewKeyFrame();
+			// Check recent MapPoints
+			MapPointCulling();
+			// Triangulate new MapPoints
+			//	    CreateNewMapPoints();
+
+			//	    detect and find Objects
+			DetectAndCombine();
+
+
+			if(!CheckNewKeyFrames())
+			{
+				// Find more matches in neighbor keyframes and fuse point duplications
+				SearchInNeighbors();
+			}
+
+			mbAbortBA = false;
+
+			if(!CheckNewKeyFrames() && !stopRequested())
+			{
+				// Local BA
+				if(mpMap->KeyFramesInMap()>2)
+					Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame,&mbAbortBA, mpMap);
+
+				// Check redundant local Keyframes
+				KeyFrameCulling();
+			}
+
+			mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
 		}
+		else if(Stop())
+		{
+			// Safe area to stop
+			while(isStopped() && !CheckFinish())
+			{
+				usleep(3000);
+			}
+			if(CheckFinish())
+				break;
+		}
+
+		ResetIfRequested();
+
+		// Tracking will see that Local Mapping is busy
+		SetAcceptKeyFrames(true);
+
 		if(CheckFinish())
 			break;
+
+		usleep(3000);
 	}
 
-	ResetIfRequested();
-
-	// Tracking will see that Local Mapping is busy
-	SetAcceptKeyFrames(true);
-
-	if(CheckFinish())
-		break;
-
-	usleep(3000);
-    }
-
-    SetFinish();
+	SetFinish();
 }
 
 void LocalMapping::InsertKeyFrame(KeyFrame *pKF)
 {
 	unique_lock<mutex> lock(mMutexNewKFs);
 	/*
-	if(mlNewKeyFrames.size()==4)
-		mlNewKeyFrames.pop_front();
-	*/
+	   if(mlNewKeyFrames.size()==4)
+	   mlNewKeyFrames.pop_front();
+	 */
 	mlNewKeyFrames.push_back(pKF);
 	mbAbortBA=true;
 }
@@ -350,8 +271,6 @@ void LocalMapping::ProcessNewKeyFrame()
 
 	// Associate MapPoints to the new keyframe and update normal and descriptor
 	const vector<MapPoint*> vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();
-	//    ROS_ERROR("1 %ld",vpMapPointMatches.size());
-	//	ROS_ERROR("mlp 1 %ld",mlpRecentAddedMapPoints.size());
 
 	for(size_t i=0; i<vpMapPointMatches.size(); i++)
 	{

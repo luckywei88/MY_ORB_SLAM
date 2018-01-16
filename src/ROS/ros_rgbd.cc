@@ -152,7 +152,7 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const senso
 		    };
 		    cv::Mat currentm(4,4,CV_32F,a);
 		    cv::Mat finalm=ORB_SLAM2::Converter::toRight(currentm);
-		    sendpc->sendout(mpSLAM->getCurrentFrame().cloud,finalm,time);
+		    //sendpc->sendout(mpSLAM->getCurrentFrame().cloud,finalm);
 		}
 	    }
 	}	

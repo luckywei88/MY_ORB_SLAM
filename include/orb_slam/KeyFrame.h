@@ -66,6 +66,7 @@ public:
     cv::Mat GetPose();
     cv::Mat GetPoseInverse();
     cv::Mat GetPoseRight();
+    Eigen::Matrix4f GetEigen();
     cv::Mat GetCameraCenter();
     cv::Mat GetStereoCenter();
     cv::Mat GetRotation();
@@ -224,6 +225,7 @@ protected:
     cv::Mat Cw; // Stereo middel point. Only for visualization
 
     cv::Mat TwcR;
+    Eigen::Matrix4f *pt;
 
     // MapPoints associated to keypoints
     std::vector<MapPoint*> mvpMapPoints;

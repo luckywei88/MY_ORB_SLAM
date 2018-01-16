@@ -15,6 +15,7 @@
 #include <pcl/common/distances.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/registration/icp.h>
 
 namespace ORB_SLAM2
@@ -60,6 +61,7 @@ namespace ORB_SLAM2
 	KeyFrameDrawer* keyframedrawer;
 //	CPF* cpf;
 	pcl::VoxelGrid<PointT>* vg;
+	pcl::StatisticalOutlierRemoval<PointT>* sor;
 	pcl::IterativeClosestPoint<PointT,PointT>* icp;
 
 	//lock

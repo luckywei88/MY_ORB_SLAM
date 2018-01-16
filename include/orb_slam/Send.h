@@ -41,9 +41,11 @@ namespace ORB_SLAM2
 		public:
 			typedef pcl::PointXYZRGB point_type;
 			typedef pcl::PointCloud<point_type> pointcloud_type;
+			typedef pcl::PointXYZRGB PointT;
+			typedef pcl::PointCloud<PointT> PointC;
 			Send(std::string world,std::string base,std::string odom);
 			~Send();
-			void sendout(pointcloud_type *pc,cv::Mat matrix,const ros::Time& time);
+			void sendout(PointC::Ptr pc,cv::Mat matrix);
 			void loopsendout(string file,cv::Mat matrix);
 			void cmdcallback(const std_msgs::String::ConstPtr& msg);
 			void startloop();

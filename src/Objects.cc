@@ -21,6 +21,11 @@ namespace ORB_SLAM2
 		//    cpf=new CPF();  0.35
 		vg=new pcl::VoxelGrid<PointT>();
 		vg->setLeafSize(0.005,0.005,0.005);
+
+                sor=new pcl::StatisticalOutlierRemoval<PointT>();
+		sor->setMeanK(50);
+		sor->setStddevMulThresh(1.0);
+
 		icp=new pcl::IterativeClosestPoint<PointT,PointT>();
 		icp->setMaximumIterations(20);
 		icp->setEuclideanFitnessEpsilon(0.005);
@@ -188,6 +193,8 @@ namespace ORB_SLAM2
 
 					vg->setInputCloud(cloud);
 					vg->filter(*cloud);
+					sor->setInputCloud(cloud);
+					sor->filter(*cloud);
 
 					Eigen::Matrix4f pt(4,4);
 					pt<<
@@ -238,29 +245,12 @@ namespace ORB_SLAM2
 			return;
 		set<Object*>::iterator tmpobjstart=objs.begin();
 		set<Object*>::iterator tmpobjend=objs.end();
-		int k=0;
 		PointC::Ptr target=boost::make_shared<PointC>();
 		while(tmpobjstart!=tmpobjend)
 		{
 			Object* tmpobj=*tmpobjstart;
-			auto mapstart=tmpobj->pcmap.begin();
-			auto mapend=tmpobj->pcmap.end();
-			PointC::Ptr totalpc=boost::make_shared<PointC>();
-			while(mapstart!=mapend)
-			{
-				KeyFrame* kf=mapstart->first;
-				PointC::Ptr pc=mapstart->second;
-
-				cv::Mat pose=kf->GetPoseRight();
-				Eigen::Matrix4f ptm=Converter::toMatrix4d(pose);
-
-				PointC::Ptr tmppc=boost::make_shared<PointC>();
-				pcl::transformPointCloud(*pc,*tmppc,ptm);
-				*totalpc+=*tmppc;
-				mapstart++;
-			}
+			auto totalpc=tmpobj->GetPC();	
 			tmpobjstart++;
-			k++;
 			*target+=*totalpc;
 		}
 

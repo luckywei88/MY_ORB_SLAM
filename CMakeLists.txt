@@ -61,6 +61,7 @@ set(
     -gencode arch=compute_62,code=sm_62
  
 )
+add_definitions(-DROS)
 add_definitions(-DGPU)
 add_definitions(-DOPENCV)
 find_package(Boost REQUIRED COMPONENTS thread)

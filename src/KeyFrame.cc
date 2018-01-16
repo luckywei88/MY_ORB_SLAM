@@ -142,6 +142,13 @@ void KeyFrame::SetPose(const cv::Mat &Tcw_)
     Cw = Twc*center;
 
     TwcR=Converter::toRight(Twc);
+	
+	pt=new Eigen::Matrix4f(4,4);
+           *pt<<
+               TwcR.at<float>(0,0),TwcR.at<float>(0,1),TwcR.at<float>(0,2),TwcR.at<float>(0,3),
+               TwcR.at<float>(1,0),TwcR.at<float>(1,1),TwcR.at<float>(1,2),TwcR.at<float>(1,3),
+               TwcR.at<float>(2,0),TwcR.at<float>(2,1),TwcR.at<float>(2,2),TwcR.at<float>(2,3),
+               0,0,0,1;
 
 }
 
@@ -180,7 +187,20 @@ void KeyFrame::SetPoseByRight(const cv::Mat &TwcR_)
     cv::Mat tcw=-Rwc.inv()*Ow;
     Rcw.copyTo(Tcw.rowRange(0,3).colRange(0,3));
     tcw.copyTo(Tcw.rowRange(0,3).col(3));
+	
+     //Eigen::Matrix4f ptm(4,4);
+	pt=new Eigen::Matrix4f(4,4);
+           *pt<<
+               TwcR.at<float>(0,0),TwcR.at<float>(0,1),TwcR.at<float>(0,2),TwcR.at<float>(0,3),
+               TwcR.at<float>(1,0),TwcR.at<float>(1,1),TwcR.at<float>(1,2),TwcR.at<float>(1,3),
+               TwcR.at<float>(2,0),TwcR.at<float>(2,1),TwcR.at<float>(2,2),TwcR.at<float>(2,3),
+               0,0,0,1;
+}
 
+Eigen::Matrix4f KeyFrame::GetEigen()
+{
+    unique_lock<mutex> lock(mMutexPose);
+    return *pt;	
 }
 
 cv::Mat KeyFrame::GetPoseRight()

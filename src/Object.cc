@@ -18,6 +18,8 @@ namespace ORB_SLAM2
 	    }
 	}
 	AllPC=boost::make_shared<PointC>();
+	auto pt=kf->GetEigen();
+	pcl::transformPointCloud(*pc,*pc,pt);
 	*AllPC+=*pc;
 	kdtree=new pcl::KdTreeFLANN<PointT>();
 	kdtree->setInputCloud(AllPC);
@@ -36,6 +38,8 @@ namespace ORB_SLAM2
 		    clazz=i;
 		}
 	}
+	auto pt=kf->GetEigen();
+	pcl::transformPointCloud(*pc,*pc,pt);
 	*AllPC+=*pc;
 	if(kdtree!=NULL)
 		delete kdtree;
@@ -47,6 +51,7 @@ namespace ORB_SLAM2
     void Object::remove(KeyFrame* kf)
     {
 	pcmap.erase(kf);
+	/*
 	AllPC=boost::make_shared<PointC>();
 	for(auto start=pcmap.begin();start!=pcmap.end();start++)
 	{
@@ -56,6 +61,7 @@ namespace ORB_SLAM2
 		delete kdtree;
 	kdtree=new pcl::KdTreeFLANN<PointT>();
 	kdtree->setInputCloud(AllPC);
+	*/
     }
 
     bool Object::compare(int type, PointC::Ptr pc)

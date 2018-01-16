@@ -16,8 +16,9 @@ Send::Send(string world,string base,string odom)
 	cmdsub=nh.subscribe<std_msgs::String>("/tmp/cmd",1,&Send::cmdcallback,this);	
 }	
 
-void Send::sendout(pointcloud_type *pc,cv::Mat matrix,const ros::Time& time)
+void Send::sendout(PointC::Ptr pc,cv::Mat pose)
 {
+	/*
 	tf::StampedTransform obtf;
 	try
 	{
@@ -29,11 +30,12 @@ void Send::sendout(pointcloud_type *pc,cv::Mat matrix,const ros::Time& time)
 		ROS_ERROR("error %s",ex.what());
 		return;
 	}
-	cv::Mat finalk(4,4,CV_32F);
-	finalk=matrix;
-	tf::Vector3 origin;
+	*/
+	//cv::Mat finalk(4,4,CV_32F);
+//	finalk=matrix;
+	/*
 	origin.setValue(
-			finalk.at<float>(2,3),-finalk.at<float>(0,3),-finalk.at<float>(1,3)+0.58);
+			finalk.at<float>(2,3),-finalk.at<float>(0,3),-finalk.at<float>(1,3)+1);
 	tf::Matrix3x3 tf3d;
 	tf3d.setValue(
 			finalk.at<float>(0,0),finalk.at<float>(0,1),finalk.at<float>(0,2),
@@ -45,22 +47,52 @@ void Send::sendout(pointcloud_type *pc,cv::Mat matrix,const ros::Time& time)
 	tf::Quaternion tfq(-tfqt.getZ(),tfqt.getX(),tfqt.getY(),-tfqt.getW());
 	rostf.setOrigin(origin);
 	rostf.setRotation(tfq);
-	tf::Transform result=rostf*obtf.inverse();
-	Eigen::Matrix4f pt(4,4);
-	pt<<
-		 0, 0, 1, 0,
-		-1, 0, 0, 0,
-		 0,-1, 0, 0,
-		 0, 0, 0, 1;
-	pcl::transformPointCloud(*pc,*pc,pt);
+	*/
+
+/*
+	Eigen::Matrix4f ptm(4,4);
+           ptm<<
+               pose.at<float>(0,0),pose.at<float>(0,1),pose.at<float>(0,2),pose.at<float>(0,3),
+               pose.at<float>(1,0),pose.at<float>(1,1),pose.at<float>(1,2),pose.at<float>(1,3),
+               pose.at<float>(2,0),pose.at<float>(2,1),pose.at<float>(2,2),pose.at<float>(2,3),
+               0,0,0,1;
+	pcl::transformPointCloud(*pc,*pc,ptm);
+*/	
+	tf::Vector3 origin1;
+	origin1.setValue(
+			pose.at<float>(0,3),pose.at<float>(1,3),pose.at<float>(2,3)+1);
+	tf::Matrix3x3 tf3d1;
+	tf3d1.setValue(
+			pose.at<float>(0,0),pose.at<float>(0,1),pose.at<float>(0,2),
+			pose.at<float>(1,0),pose.at<float>(1,1),pose.at<float>(1,2),
+			pose.at<float>(2,0),pose.at<float>(2,1),pose.at<float>(2,2));
+	tf::Transform rostf1(tf3d1,origin1);
+
+	tf::Vector3 origin;
+	origin.setValue(
+			0,0,1);
+	tf::Matrix3x3 tf3d;
+	tf3d.setValue(
+			1,0,0,
+			0,1,0,
+			0,0,1);
+	tf::Transform rostf(tf3d,origin);
+
+
+	//tf::Transform result=rostf*obtf.inverse();
+
 	sensor_msgs::PointCloud2 pcl2;
 	toROSMsg(*pc,pcl2);
 	pcl2.header.seq=i;
+	ros::Time time=ros::Time::now();
 	pcl2.header.stamp=time;
 	pcl2.header.frame_id=base;
 	pclpub.publish(pcl2);
-	br.sendTransform(tf::StampedTransform(result,time,world,odom));
+	//br.sendTransform(tf::StampedTransform(result,time,world,odom));
+	br.sendTransform(tf::StampedTransform(rostf,time,world,base));
+	br.sendTransform(tf::StampedTransform(rostf1,time,world,odom));
 	i++;
+	cout<<"send complete"<<endl;
 }
 
 bool Send::getloop()
