@@ -2,6 +2,10 @@
 #define SEND_H
 
 #include <ros/ros.h>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/Image.h>
+#include <cv_bridge/cv_bridge.h>
+
 #include <tf/transform_broadcaster.h>
 #include <opencv/cv.h>
 #include <opencv2/opencv.hpp>
@@ -45,13 +49,15 @@ namespace ORB_SLAM2
 			typedef pcl::PointCloud<PointT> PointC;
 			Send(std::string world,std::string base,std::string odom);
 			~Send();
+			void Frame(cv::Mat image);
+			void KeyFrame(cv::Mat image);
 			void sendout(PointC::Ptr pc,cv::Mat matrix);
 			void loopsendout(string file,cv::Mat matrix);
 			void cmdcallback(const std_msgs::String::ConstPtr& msg);
 			void startloop();
 			bool getloop();
 
-			ros::Publisher pclpub,looppub,cmdpub;
+			ros::Publisher pclpub,looppub,cmdpub,framepub,keypub;
 			ros::Subscriber cmdsub;
 			tf::TransformBroadcaster br;
 			tf::TransformListener tf_listener;

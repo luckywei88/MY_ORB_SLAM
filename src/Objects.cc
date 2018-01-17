@@ -31,6 +31,13 @@ namespace ORB_SLAM2
 		icp->setEuclideanFitnessEpsilon(0.005);
 		icp->setTransformationEpsilon(1e-8);
 		icp->setMaxCorrespondenceDistance(0.01);
+
+		pt=new Eigen::Matrix4f(4,4);
+		*pt<<
+			0, 0, 1, 0,
+			-1, 0, 0, -0.05,
+			0,-1, 0, 0,
+			0, 0, 0, 1;
 	}
 
 	int Objects::max_index(float *a, int n)
@@ -102,42 +109,43 @@ namespace ORB_SLAM2
 		std::vector<int> tmpbox,tmpbox1,tmpTypes1;
 
 		//pointcloud
-		/*PointC* cloud=new PointC();
-		  for(int i=0;i<h;i++)
-		  {
-		  for(int j=0;j<w;j++)
-		  {
-		  float z=depth.at<float>(i,j);
-		  if(z<0.01||z>5)
-		  {
-		  pc[i][j]=NULL;
-		  continue;
-		  }
-		  float y=(i-cy)*z*fyinv;
-		  float x=(j-cx)*z*fxinv;
-		  cv::Vec3b color=rgb.at<cv::Vec3b>(i,j);
-		  PointT* pt=new PointT();
-		  pt->x=x;
-		  pt->y=y;
-		  pt->z=z;
-		  unsigned char r=(unsigned char)color[0];
-		  unsigned char g=(unsigned char)color[1];
-		  unsigned char b=(unsigned char)color[2];
-		  unsigned int col=(r<<16)|(g<<8)|b;
-		  pt->rgb=*reinterpret_cast<float*>(&col);
-		  cloud->push_back(*pt);
-		  }
-		  }
-		  cout<<"cloud "<<cloud->size()<<endl;
-		  kf->WriteCloud(cloud);
-		 */
+		PointC::Ptr cloud=boost::make_shared<PointC>();
+		for(int i=0;i<h;i++)
+		{
+			for(int j=0;j<w;j++)
+			{
+				float z=depth.at<float>(i,j);
+				if(z<0.01)
+				{
+					PointT pt;
+					pt.x=pt.y=pt.z=0;	
+					cloud->push_back(pt);
+					continue;
+				}
+				float y=(i-cy)*z*fyinv;
+				float x=(j-cx)*z*fxinv;
+				cv::Vec3b color=rgb.at<cv::Vec3b>(i,j);
+				PointT pt;
+				pt.x=x;
+				pt.y=y;
+				pt.z=z;
+				unsigned char r=(unsigned char)color[0];
+				unsigned char g=(unsigned char)color[1];
+				unsigned char b=(unsigned char)color[2];
+				unsigned int col=(r<<16)|(g<<8)|b;
+				pt.rgb=*reinterpret_cast<float*>(&col);
+				cloud->push_back(pt);
+			}
+		}
+		pcl::transformPointCloud(*cloud,*cloud,*pt);
+		cout<<"cloud "<<cloud->size()<<endl;
 
 		// hehe
 		for(int i=0;i<total;i++)
 		{
 			int clazz = max_index(probs[i],classes);
 			float prob=probs[i][clazz];
-						
+
 
 			if(prob>yolo->thresh)
 			{
@@ -155,7 +163,7 @@ namespace ORB_SLAM2
 
 				printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 				string s(names[clazz]);
-			
+
 				if(s=="person")
 				{
 					//delete unstable feature
@@ -164,45 +172,27 @@ namespace ORB_SLAM2
 				}
 				else
 				{
-					PointC::Ptr cloud=boost::make_shared<PointC>();
+					PointC::Ptr cloud1=boost::make_shared<PointC>();
 					//segmentation
 					for(int n=top;n<bot+1;n++)
 					{
 						for(int j=left;j<right+1;j++)
 						{
-							float z=depth.at<float>(n,j);
-							if(z<0.3)
-							{
-								continue;
-							}
-							float y=(n-cy)*z*fyinv;
-							float x=(j-cx)*z*fxinv;
-							cv::Vec3b color=rgb.at<cv::Vec3b>(n,j);
-							PointT pt;
-							pt.x=x;
-							pt.y=y;
-							pt.z=z;
-							unsigned char r=(unsigned char)color[0];
-							unsigned char g=(unsigned char)color[1];
-							unsigned char b=(unsigned char)color[2];
+							PointT pt=(*cloud)[n*w+j];
+							cloud1->push_back(pt);	
+							unsigned char r=255;
+							unsigned char g=0;
+							unsigned char b=0;
 							unsigned int col=(r<<16)|(g<<8)|b;
-							pt.rgb=*reinterpret_cast<float*>(&col);
-							cloud->push_back(pt);	 
+							(*cloud)[n*w+j].rgb=*reinterpret_cast<float*>(&col);
 						}
 					}
 
-					vg->setInputCloud(cloud);
-					vg->filter(*cloud);
-					sor->setInputCloud(cloud);
-					sor->filter(*cloud);
+					vg->setInputCloud(cloud1);
+					vg->filter(*cloud1);
+					sor->setInputCloud(cloud1);
+					sor->filter(*cloud1);
 
-					Eigen::Matrix4f pt(4,4);
-					pt<<
-						0, 0, 1, 0,
-						-1, 0, 0, -0.05,
-						0,-1, 0, 0,
-						0, 0, 0, 1;
-					pcl::transformPointCloud(*cloud,*cloud,pt);
 					//	    cpf->Segment(cloud);
 					//kf->writeCloud(cpf->Segment(cloud),i);
 					//kf->WriteCloud(cloud,i);
@@ -213,7 +203,7 @@ namespace ORB_SLAM2
 					tmpbox.push_back(top);
 					tmpbox.push_back(bot);
 					tmpTypes.push_back(clazz);
-					tmpPCs.push_back(cloud);
+					tmpPCs.push_back(cloud1);
 					float* tmpProb=(float*)calloc(classes,sizeof(float));
 					for(int j=0;j<classes;j++)
 					{
@@ -230,6 +220,12 @@ namespace ORB_SLAM2
 
 			}
 		}
+		vg->setInputCloud(cloud);
+		vg->filter(*cloud);
+		sor->setInputCloud(cloud);
+		sor->filter(*cloud);
+		kf->SetPointCloud(cloud);
+
 		keyframedrawer->Update(img,names, yolo->alphabet,classes,tmpbox1,tmpTypes1);
 		yolo->delet();
 	}

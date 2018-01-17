@@ -12,9 +12,31 @@ Send::Send(string world,string base,string odom)
 	ros::NodeHandle nh;
 	loop=false;
 	pclpub=nh.advertise<sensor_msgs::PointCloud2>("/tmp/pointcloud",1);	
+	framepub=nh.advertise<sensor_msgs::Image>("/tmp/frame",1);	
+	keypub=nh.advertise<sensor_msgs::Image>("/tmp/keyframe",1);	
 	cmdpub=nh.advertise<std_msgs::String>("/tmp/cmd",1);
 	cmdsub=nh.subscribe<std_msgs::String>("/tmp/cmd",1,&Send::cmdcallback,this);	
-}	
+}
+
+void Send::Frame(cv::Mat image)
+{
+	cv_bridge::CvImage rgb;
+	sensor_msgs::Image rgb_image;
+	rgb.encoding=sensor_msgs::image_encodings::BGR8;
+	rgb.image=image;
+	rgb.toImageMsg(rgb_image);
+	framepub.publish(rgb_image);
+}
+
+void Send::KeyFrame(cv::Mat image)
+{
+	cv_bridge::CvImage rgb;
+	sensor_msgs::Image rgb_image;
+	rgb.encoding=sensor_msgs::image_encodings::BGR8;
+	rgb.image=image;
+	rgb.toImageMsg(rgb_image);
+	keypub.publish(rgb_image);
+}
 
 void Send::sendout(PointC::Ptr pc,cv::Mat pose)
 {

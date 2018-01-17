@@ -59,6 +59,17 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
     	WriteCloud(F.cloud,0);
     mRGB=F.mRGB;
     mDepth=F.mDepth;
+    keyframepc=boost::make_shared<PointC>();
+}
+
+void KeyFrame::SetPointCloud(PointC::Ptr pc)
+{
+	*keyframepc+=*pc;
+}
+
+KeyFrame::PointC::Ptr KeyFrame::GetPointCloud()
+{
+	return keyframepc;
 }
 
 void KeyFrame::WriteCloud(pointcloud_type* cloud,int i)

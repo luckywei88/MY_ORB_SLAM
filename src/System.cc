@@ -163,6 +163,8 @@ System::System(AllConfig* config, const eSensor sensor)
 	Send* sendpc=new Send(world,base,odom);
 	//mpLoopCloser->SetSender(sendpc);
 	mpLocalMapper->SetSender(sendpc);
+	mpLocalMapper->SetKeyFrameDrawer(mpKeyFrameDrawer);
+	mpTracker->SetSender(sendpc);
     }
 }
 

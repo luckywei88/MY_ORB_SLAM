@@ -22,6 +22,7 @@
 #define LOCALMAPPING_H
 
 #include "KeyFrame.h"
+#include "KeyFrameDrawer.h"
 #include "Map.h"
 #include "LoopClosing.h"
 #include "Send.h"
@@ -46,6 +47,7 @@ class Tracking;
 class LoopClosing;
 class Map;
 class Objects;
+class KeyFrameDrawer;
 
 class LocalMapping
 {
@@ -90,6 +92,7 @@ public:
 	}
 
 	void SetSender(Send* send);
+	void SetKeyFrameDrawer(KeyFrameDrawer* keyframeDrawer);
 
 protected:
 
@@ -144,6 +147,7 @@ protected:
 
 	Objects* objs;
 	Send* mSend;
+	KeyFrameDrawer* mKeyFrameDrawer;
 };
 
 } //namespace ORB_SLAM

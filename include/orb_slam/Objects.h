@@ -64,6 +64,7 @@ namespace ORB_SLAM2
 	pcl::StatisticalOutlierRemoval<PointT>* sor;
 	pcl::IterativeClosestPoint<PointT,PointT>* icp;
 
+	Eigen::Matrix4f* pt;
 	//lock
     };
 }

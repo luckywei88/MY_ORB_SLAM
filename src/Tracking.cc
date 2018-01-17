@@ -145,7 +145,7 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
         else
             mDepthMapFactor = 1.0f/mDepthMapFactor;
     }
-
+    mSend=NULL;
 }
 
 void Tracking::SetLocalMapper(LocalMapping *pLocalMapper)
@@ -161,6 +161,11 @@ void Tracking::SetLoopClosing(LoopClosing *pLoopClosing)
 void Tracking::SetViewer(Viewer *pViewer)
 {
 	mpViewer=pViewer;
+}
+
+void Tracking::SetSender(Send* send)
+{
+	mSend=send;
 }
 
 
@@ -245,6 +250,8 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB1,const cv::Mat &imD1, const
 	}
 	mCurrentFrame = Frame(imRGB,mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 	Track();
+	if(mSend!=NULL)
+		mSend->Frame(mpFrameDrawer->DrawFrame());
 	return mCurrentFrame.mTcw.clone();
 }
 
@@ -551,7 +558,6 @@ void Tracking::Track()
 		mlFrameTimes.push_back(mlFrameTimes.back());
 		mlbLost.push_back(mState==LOST);
 	}
-
 }
 
 void Tracking::StereoInitialization()

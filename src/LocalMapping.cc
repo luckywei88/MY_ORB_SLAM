@@ -34,6 +34,7 @@ LocalMapping::LocalMapping(Map *pMap, const float bMonocular):
     mbAbortBA(false), mbStopped(false), mbStopRequested(false), mbNotStop(false), mbAcceptKeyFrames(true)
 {
     mSend=NULL;
+    mKeyFrameDrawer=NULL;
 }
 
 void LocalMapping::SetLoopCloser(LoopClosing* pLoopCloser)
@@ -56,6 +57,11 @@ void LocalMapping::SetSender(Send* send)
     mSend=send;
 }
 
+void LocalMapping::SetKeyFrameDrawer(KeyFrameDrawer* keyframeDrawer)
+{
+    mKeyFrameDrawer=keyframeDrawer;
+}
+
 void LocalMapping::DetectAndCombine()
 {
 
@@ -71,15 +77,7 @@ void LocalMapping::DetectAndCombine()
     auto TypesEnd=objs->tmpTypes.end();
     list<PointC::Ptr>::iterator PCsBegin=objs->tmpPCs.begin();
     list<float*>::iterator ProbsBegin=objs->tmpProbs.begin();
-/*
-    PointC::Ptr tmptotalpc=boost::make_shared<PointC>();
-    while(PCsBegin!=objs->tmpPCs.end())
-    {
-	*tmptotalpc+=*(*PCsBegin);
-	PCsBegin++;	
-    }
-	   mSend->sendout(tmptotalpc, mpCurrentKeyFrame->GetPoseRight()); 
-*/
+    
     PCsBegin=objs->tmpPCs.begin();
     //find Candidates
     int nn=10;
@@ -149,10 +147,35 @@ void LocalMapping::DetectAndCombine()
     }
     cout<<"detect complete"<<endl;
 
-
-
+	
+/*
    if(mSend!=NULL)
    {
+	if(mKeyFrameDrawer!=NULL)
+		mSend->KeyFrame(mKeyFrameDrawer->DrawKeyFrame());
+	vector<KeyFrame*> vector=mpMap->GetAllKeyFrames();
+	auto start=vector.begin();
+	PointC::Ptr totalpc=boost::make_shared<PointC>();
+	while(start!=vector.end())
+	{
+		KeyFrame* tmp=*start;
+		PointC::Ptr pc=tmp->GetPointCloud();
+		cout<<pc->size()<<endl;
+		auto pose=tmp->GetEigen();
+		pcl::transformPointCloud(*pc,*pc,pose);
+		*totalpc+=*pc;
+		start++;	
+	}
+	mSend->sendout(totalpc, mpCurrentKeyFrame->GetPoseRight()); 
+	
+   }
+   cout<<"send "<<endl;
+
+*/
+   if(mSend!=NULL)
+   {
+	if(mKeyFrameDrawer!=NULL)
+		mSend->KeyFrame(mKeyFrameDrawer->DrawKeyFrame());
 	   list<Object*>::iterator tmpobjstart=objs->vector.begin(); 
 	   list<Object*>::iterator tmpobjend=objs->vector.end();
 	   PointC::Ptr totalpc=boost::make_shared<PointC>();
@@ -165,7 +188,6 @@ void LocalMapping::DetectAndCombine()
 	   }
 	   mSend->sendout(totalpc, mpCurrentKeyFrame->GetPoseRight()); 
    }
-
 }
 
 

@@ -50,6 +50,7 @@ class Map;
 class LocalMapping;
 class LoopClosing;
 class System;
+class Send;
 
 class Tracking
 {  
@@ -75,7 +76,7 @@ public:
     // Use this function if you have deactivated local mapping and you only want to localize the camera.
     void InformOnlyTracking(const bool &flag);
 
-
+    void SetSender(Send* send);
 
 public:
 
@@ -220,6 +221,7 @@ protected:
 
     list<MapPoint*> mlpTemporalPoints;
 
+    Send* mSend;
 };
 
 } //namespace ORB_SLAM
