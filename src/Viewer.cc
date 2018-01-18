@@ -83,6 +83,7 @@ void Viewer::Run()
     mbFinished = false;
 
     pangolin::CreateWindowAndBind("ORB-SLAM2: Map Viewer",1024,768);
+    //glutInitWindowPosition(448,156);
 
     // 3D Mouse handler requires depth testing to be enabled
     glEnable(GL_DEPTH_TEST);

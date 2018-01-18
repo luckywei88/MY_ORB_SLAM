@@ -179,12 +179,14 @@ namespace ORB_SLAM2
 						for(int j=left;j<right+1;j++)
 						{
 							PointT pt=(*cloud)[n*w+j];
-							cloud1->push_back(pt);	
+							cloud1->push_back(pt);
+							/*	
 							unsigned char r=255;
 							unsigned char g=0;
 							unsigned char b=0;
 							unsigned int col=(r<<16)|(g<<8)|b;
 							(*cloud)[n*w+j].rgb=*reinterpret_cast<float*>(&col);
+							*/
 						}
 					}
 
