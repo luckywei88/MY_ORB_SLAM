@@ -110,7 +110,6 @@ int main(int argc, char **argv)
         double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
 
         vTimesTrack[ni]=ttrack;
-
         // Wait to load the next frame
         double T=0;
         if(ni<nImages-1)
@@ -119,7 +118,8 @@ int main(int argc, char **argv)
             T = tframe-vTimestamps[ni-1];
 
         if(ttrack<T)
-            usleep((T-ttrack)*1e6);
+            usleep((T)*1e6*15);
+            //usleep((T-ttrack)*1e6*50);
     }
 
     // Stop all threads

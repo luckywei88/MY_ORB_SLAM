@@ -1169,7 +1169,7 @@ bool Tracking::NeedNewKeyFrame()
 		thRefRatio = 0.9f;
 
 	//lucky
-	//	thRefRatio=0.85f;
+//		thRefRatio=0.85f;
 
 	float thMapRatio = 0.35f;
 	if(mnMatchesInliers>300)
