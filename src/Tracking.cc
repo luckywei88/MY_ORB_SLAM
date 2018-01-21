@@ -325,17 +325,17 @@ void Tracking::Track()
 				// Local Mapping might have changed some MapPoints tracked in last frame
 				CheckReplacedInLastFrame();
 
-
+/*
 				firstMatch = TrackReferenceKeyFrame();
 			//	cout<<"reference key frame "<<firstMatch<<endl;
 				if(firstMatch>=10)
 					bOK=true;
 				else
 					bOK=false;
+*/
 
 
 
-/*
 				if(mVelocity.empty() || mCurrentFrame.mnId<mnLastRelocFrameId+2)
 				{
 					//bOK = TrackReferenceKeyFrame();
@@ -360,7 +360,6 @@ void Tracking::Track()
 
 					}
 				}
-*/
 
 			}
 			else
