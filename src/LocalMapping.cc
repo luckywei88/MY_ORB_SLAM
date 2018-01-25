@@ -213,7 +213,7 @@ void LocalMapping::Run()
 			//	    CreateNewMapPoints();
 
 			//	    detect and find Objects
-//			DetectAndCombine();
+			DetectAndCombine();
 
 
 			if(!CheckNewKeyFrames())
