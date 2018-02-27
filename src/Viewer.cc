@@ -165,7 +165,7 @@ void Viewer::Run()
 */
         pangolin::FinishFrame();
 
-/*
+
         cv::Mat im = mpFrameDrawer->DrawFrame();
 	if(mpKeyFrameDrawer!=NULL)
 	{
@@ -174,7 +174,7 @@ void Viewer::Run()
 	}
         cv::imshow("ORB-SLAM2: Current Frame",im);
         cv::waitKey(mT);
-*/
+
 
         if(menuReset)
         {
