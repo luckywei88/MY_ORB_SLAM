@@ -147,6 +147,22 @@ void LocalMapping::DetectAndCombine()
     }
     cout<<"detect complete"<<endl;
 
+    char file1[100];
+    sprintf(file1,"/home/lucky/pc/tmppcd/pc%ldobj.png",mpCurrentKeyFrame->mnId);
+    imwrite(file1,mpCurrentKeyFrame->mRGB);
+    list<Object*> l=objs->GetAllObjects();
+    auto start=l.begin();
+    int i=0;
+    while(start!=l.end())
+    {
+	Object* tmp=*start;
+	PointC::Ptr pc=tmp->GetPC();
+	char file[100];
+	sprintf(file,"/home/lucky/pc/tmppcd/pc%ldobj%d.pcd",mpCurrentKeyFrame->mnId,i);
+	pcl::io::savePCDFile(file,*pc,false);
+	i++;
+	start++;
+    } 
 	
 /*
    if(mSend!=NULL)
