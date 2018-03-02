@@ -212,6 +212,7 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
 cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB1,const cv::Mat &imD1, const double &timestamp)
 {
 	cv::Mat imRGB,imD;
+/*
 	if(imRGB1.cols!=320&&imRGB1.rows!=240)
 	{
 		cv::Size dsize=cv::Size(320,240);
@@ -225,7 +226,11 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB1,const cv::Mat &imD1, const
 		imRGB=imRGB1;
 		imD=imD1;
 	}
-
+*/
+//
+		imRGB=imRGB1;
+		imD=imD1;
+//
 	mImGray = imRGB.clone();
 	cv::Mat imDepth = imD;
 	

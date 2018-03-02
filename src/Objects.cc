@@ -190,8 +190,8 @@ namespace ORB_SLAM2
 						}
 					}
 
-					vg->setInputCloud(cloud1);
-					vg->filter(*cloud1);
+//					vg->setInputCloud(cloud1);
+//					vg->filter(*cloud1);
 					sor->setInputCloud(cloud1);
 					sor->filter(*cloud1);
 
@@ -222,8 +222,8 @@ namespace ORB_SLAM2
 
 			}
 		}
-		vg->setInputCloud(cloud);
-		vg->filter(*cloud);
+//		vg->setInputCloud(cloud);
+//		vg->filter(*cloud);
 		sor->setInputCloud(cloud);
 		sor->filter(*cloud);
 		kf->SetPointCloud(cloud);
