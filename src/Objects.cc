@@ -115,25 +115,26 @@ namespace ORB_SLAM2
 			for(int j=0;j<w;j++)
 			{
 				float z=depth.at<float>(i,j);
+				PointT pt;
+
+				cv::Vec3b color=rgb.at<cv::Vec3b>(i,j);
+				unsigned char r=(unsigned char)color[0];
+				unsigned char g=(unsigned char)color[1];
+				unsigned char b=(unsigned char)color[2];
+				unsigned int col=(r<<16)|(g<<8)|b;
+				pt.rgb=*reinterpret_cast<float*>(&col);
+
 				if(z<0.01)
 				{
-					PointT pt;
 					pt.x=pt.y=pt.z=0;	
 					cloud->push_back(pt);
 					continue;
 				}
 				float y=(i-cy)*z*fyinv;
 				float x=(j-cx)*z*fxinv;
-				cv::Vec3b color=rgb.at<cv::Vec3b>(i,j);
-				PointT pt;
 				pt.x=x;
 				pt.y=y;
 				pt.z=z;
-				unsigned char r=(unsigned char)color[0];
-				unsigned char g=(unsigned char)color[1];
-				unsigned char b=(unsigned char)color[2];
-				unsigned int col=(r<<16)|(g<<8)|b;
-				pt.rgb=*reinterpret_cast<float*>(&col);
 				cloud->push_back(pt);
 			}
 		}
