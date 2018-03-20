@@ -146,7 +146,7 @@ void LocalMapping::DetectAndCombine()
 
     }
     cout<<"detect complete"<<endl;
-
+/*
     char file1[100];
     sprintf(file1,"/home/lucky/pc/tmppcd/pc%ldobj.png",mpCurrentKeyFrame->mnId);
     imwrite(file1,mpCurrentKeyFrame->mRGB);
@@ -163,7 +163,7 @@ void LocalMapping::DetectAndCombine()
 	i++;
 	start++;
     } 
-	
+*/	
 /*
    if(mSend!=NULL)
    {

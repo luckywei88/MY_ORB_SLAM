@@ -329,7 +329,7 @@ void Tracking::Track()
 			{
 				// Local Mapping might have changed some MapPoints tracked in last frame
 				CheckReplacedInLastFrame();
-
+/*
 				firstMatch = TrackReferenceKeyFrame();
 			//	cout<<"reference key frame "<<firstMatch<<endl;
 				if(firstMatch>=10)
@@ -337,8 +337,8 @@ void Tracking::Track()
 				else
 					bOK=false;
 
-
-/*
+*/
+///*
 
 				if(mVelocity.empty() || mCurrentFrame.mnId<mnLastRelocFrameId+2)
 				{
@@ -365,7 +365,7 @@ void Tracking::Track()
 					}
 				}
 
-*/
+//*/
 			}
 			else
 			{
@@ -942,7 +942,7 @@ void Tracking::UpdateLastFrame()
 
 	if(vDepthIdx.empty())
 		return;
-
+	return;
 	sort(vDepthIdx.begin(),vDepthIdx.end());
 
 	// We insert all close points (depth<mThDepth)
