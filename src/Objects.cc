@@ -225,8 +225,8 @@ namespace ORB_SLAM2
 		}
 //		vg->setInputCloud(cloud);
 //		vg->filter(*cloud);
-		sor->setInputCloud(cloud);
-		sor->filter(*cloud);
+//		sor->setInputCloud(cloud);
+//		sor->filter(*cloud);
 		kf->SetPointCloud(cloud);
 
 		keyframedrawer->Update(img,names, yolo->alphabet,classes,tmpbox1,tmpTypes1);

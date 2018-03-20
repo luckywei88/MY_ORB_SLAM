@@ -942,7 +942,8 @@ void Tracking::UpdateLastFrame()
 
 	if(vDepthIdx.empty())
 		return;
-	return;
+	
+	return;	
 	sort(vDepthIdx.begin(),vDepthIdx.end());
 
 	// We insert all close points (depth<mThDepth)
