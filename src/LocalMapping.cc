@@ -103,7 +103,7 @@ void LocalMapping::DetectAndCombine()
 
 
     //compute ICP
-    objs->computeICP(mpCurrentKeyFrame,NearObjs);
+//    objs->computeICP(mpCurrentKeyFrame,NearObjs);
 
     //combine OBjects
     int n=objs->classes;
@@ -146,7 +146,8 @@ void LocalMapping::DetectAndCombine()
 
     }
     cout<<"detect complete"<<endl;
-/*
+
+
     char file1[100];
     sprintf(file1,"/home/lucky/pc/tmppcd/pc%ldobj.png",mpCurrentKeyFrame->mnId);
     imwrite(file1,mpCurrentKeyFrame->mRGB);
@@ -163,7 +164,6 @@ void LocalMapping::DetectAndCombine()
 	i++;
 	start++;
     } 
-*/	
 /*
    if(mSend!=NULL)
    {
