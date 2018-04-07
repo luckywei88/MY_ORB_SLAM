@@ -65,6 +65,7 @@ namespace ORB_SLAM2
 	pcl::IterativeClosestPoint<PointT,PointT>* icp;
 
 	Eigen::Matrix4f* pt;
+	int abc;
 	//lock
     };
 }

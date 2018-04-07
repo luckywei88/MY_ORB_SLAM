@@ -57,6 +57,7 @@ class KeyFrame
 		KeyFrame(Frame &F, Map* pMap, KeyFrameDatabase* pKFDB);
 
 		void DeleteFeature(int l,int r,int t,int b);
+		cv::Mat DrawKeyFrame();
 		void CorrectMapPoint(cv::Mat &TcwR);
 
 		// Pose functions

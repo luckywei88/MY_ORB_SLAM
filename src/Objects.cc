@@ -38,6 +38,8 @@ namespace ORB_SLAM2
 			-1, 0, 0, -0.05,
 			0,-1, 0, 0,
 			0, 0, 0, 1;
+
+		abc=0;
 	}
 
 	int Objects::max_index(float *a, int n)
@@ -141,6 +143,16 @@ namespace ORB_SLAM2
 		pcl::transformPointCloud(*cloud,*cloud,*pt);
 		cout<<"cloud "<<cloud->size()<<endl;
 
+/*
+		char file[100];
+		
+		sprintf(file,"/home/lucky/workspace/shell/image/keyframe%d.png",abc);
+		imwrite(file,kf->mRGB);
+
+		sprintf(file,"/home/lucky/workspace/shell/image/keyframe%d-before.png",abc);
+		imwrite(file,kf->DrawKeyFrame());
+*/
+
 		// hehe
 		for(int i=0;i<total;i++)
 		{
@@ -164,7 +176,6 @@ namespace ORB_SLAM2
 
 				printf("%d %s : %.0f%%\n", i,names[clazz],prob*100);		
 				string s(names[clazz]);
-
 				if(s=="person")
 				{
 					//delete unstable feature
@@ -182,17 +193,17 @@ namespace ORB_SLAM2
 							PointT pt=(*cloud)[n*w+j];
 							cloud1->push_back(pt);
 							/*	
-							unsigned char r=255;
-							unsigned char g=0;
-							unsigned char b=0;
-							unsigned int col=(r<<16)|(g<<8)|b;
-							(*cloud)[n*w+j].rgb=*reinterpret_cast<float*>(&col);
-							*/
+								unsigned char r=255;
+								unsigned char g=0;
+								unsigned char b=0;
+								unsigned int col=(r<<16)|(g<<8)|b;
+								(*cloud)[n*w+j].rgb=*reinterpret_cast<float*>(&col);
+							 */
 						}
 					}
 
-//					vg->setInputCloud(cloud1);
-//					vg->filter(*cloud1);
+					//					vg->setInputCloud(cloud1);
+					//					vg->filter(*cloud1);
 					sor->setInputCloud(cloud1);
 					sor->filter(*cloud1);
 
@@ -223,13 +234,21 @@ namespace ORB_SLAM2
 
 			}
 		}
-//		vg->setInputCloud(cloud);
-//		vg->filter(*cloud);
-//		sor->setInputCloud(cloud);
-//		sor->filter(*cloud);
+		//		vg->setInputCloud(cloud);
+		//		vg->filter(*cloud);
+		//		sor->setInputCloud(cloud);
+		//		sor->filter(*cloud);
 		kf->SetPointCloud(cloud);
 
 		keyframedrawer->Update(img,names, yolo->alphabet,classes,tmpbox1,tmpTypes1);
+		
+	/*	
+		sprintf(file,"/home/lucky/workspace/shell/image/keyframe%d-semantic.png",abc);
+		imwrite(file,keyframedrawer->DrawKeyFrame());
+		sprintf(file,"/home/lucky/workspace/shell/image/keyframe%d-after.png",abc);
+		imwrite(file,kf->DrawKeyFrame());
+		abc++;	
+	*/
 		yolo->delet();
 	}
 
