@@ -158,6 +158,7 @@ void LocalMapping::DetectAndCombine()
     {
 	Object* tmp=*start;
 	PointC::Ptr pc=tmp->GetPC();
+	cout<<"type "<<tmp->getType()<<endl;
 	char file[100];
 	sprintf(file,"/home/lucky/pc/tmppcd/pc%ldobj%d.pcd",mpCurrentKeyFrame->mnId,i);
 	pcl::io::savePCDFile(file,*pc,false);

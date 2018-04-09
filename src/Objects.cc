@@ -126,7 +126,7 @@ namespace ORB_SLAM2
 				unsigned int col=(r<<16)|(g<<8)|b;
 				pt.rgb=*reinterpret_cast<float*>(&col);
 
-				if(z<0.01)
+				if(z<0)
 				{
 					pt.x=pt.y=pt.z=0;	
 					cloud->push_back(pt);
