@@ -22,7 +22,7 @@ namespace ORB_SLAM2
 	pcl::transformPointCloud(*pc,*pc,pt);
 	*AllPC+=*pc;
 	kdtree=new pcl::KdTreeFLANN<PointT>();
-	kdtree->setInputCloud(AllPC);
+	//kdtree->setInputCloud(AllPC);
     }
 
     void Object::add(KeyFrame* kf,PointC::Ptr pc, float* prob)
@@ -44,7 +44,7 @@ namespace ORB_SLAM2
 	if(kdtree!=NULL)
 		delete kdtree;
 	kdtree=new pcl::KdTreeFLANN<PointT>();
-	kdtree->setInputCloud(AllPC);
+	//kdtree->setInputCloud(AllPC);
 	
     }
 

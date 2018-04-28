@@ -40,6 +40,25 @@ namespace ORB_SLAM2
 			0, 0, 0, 1;
 
 		abc=0;
+		int n=0;
+		unsigned char r,g,b;
+		r=-63;
+		g=-63;
+		b=-51;
+		for(int i=0;i<4;i++)
+		{
+			r+=63;
+			for(int j=0;j<4;j++)
+			{
+				g+=63;
+				for(int k=0;k<5;k++)
+				{
+					b+=51;
+					color[n]=(r<<16)|(g<<8)|b;
+					n++;
+				}
+			}
+		}
 	}
 
 	int Objects::max_index(float *a, int n)
@@ -191,6 +210,7 @@ namespace ORB_SLAM2
 						for(int j=left;j<right+1;j++)
 						{
 							PointT pt=(*cloud)[n*w+j];
+							//pt.rgb=*reinterpret_cast<float*>(&color[clazz]);
 							cloud1->push_back(pt);
 							/*	
 								unsigned char r=255;
@@ -202,10 +222,10 @@ namespace ORB_SLAM2
 						}
 					}
 
-					//					vg->setInputCloud(cloud1);
-					//					vg->filter(*cloud1);
-					sor->setInputCloud(cloud1);
-					sor->filter(*cloud1);
+					//vg->setInputCloud(cloud1);
+					//vg->filter(*cloud1);
+					//sor->setInputCloud(cloud1);
+					//sor->filter(*cloud1);
 
 					//	    cpf->Segment(cloud);
 					//kf->writeCloud(cpf->Segment(cloud),i);

@@ -65,7 +65,7 @@ void LocalMapping::SetKeyFrameDrawer(KeyFrameDrawer* keyframeDrawer)
 void LocalMapping::DetectAndCombine()
 {
 
-//    cout<<"------------"<<mpCurrentKeyFrame->mnId<<" one frame---------------"<<endl;
+    cout<<"------------"<<mpCurrentKeyFrame->mnId<<" one frame---------------"<<endl;
     
     //detect objs
     objs->detection(mpCurrentKeyFrame);
@@ -101,9 +101,8 @@ void LocalMapping::DetectAndCombine()
     set<Object*>::iterator ObjsIt =NearObjs.begin();
     set<Object*>::iterator ObjsEnd=NearObjs.end();
 
-
     //compute ICP
-//    objs->computeICP(mpCurrentKeyFrame,NearObjs);
+    objs->computeICP(mpCurrentKeyFrame,NearObjs);
 
     //combine OBjects
     int n=objs->classes;
@@ -147,7 +146,7 @@ void LocalMapping::DetectAndCombine()
     }
     cout<<"detect complete"<<endl;
 
-
+/*
     char file1[100];
     sprintf(file1,"/home/lucky/pc/tmppcd/pc%ldobj.png",mpCurrentKeyFrame->mnId);
     imwrite(file1,mpCurrentKeyFrame->mRGB);
@@ -164,7 +163,8 @@ void LocalMapping::DetectAndCombine()
 	pcl::io::savePCDFile(file,*pc,false);
 	i++;
 	start++;
-    } 
+    }
+*/ 
 /*
    if(mSend!=NULL)
    {
@@ -193,17 +193,23 @@ void LocalMapping::DetectAndCombine()
    {
 	if(mKeyFrameDrawer!=NULL)
 		mSend->KeyFrame(mKeyFrameDrawer->DrawKeyFrame());
-	   list<Object*>::iterator tmpobjstart=objs->vector.begin(); 
-	   list<Object*>::iterator tmpobjend=objs->vector.end();
-	   PointC::Ptr totalpc=boost::make_shared<PointC>();
-	   while(tmpobjstart!=tmpobjend)
-	   {
+	list<Object*>::iterator tmpobjstart=objs->vector.begin(); 
+	list<Object*>::iterator tmpobjend=objs->vector.end();
+	PointC::Ptr totalpc=boost::make_shared<PointC>();
+	while(tmpobjstart!=tmpobjend)
+	{
 		   Object* tmpobj=*tmpobjstart;
+		   if(tmpobj->nObs<=2)
+		   {
+		   	tmpobjstart++;
+			continue;
+		   }
 		   PointC::Ptr pc=tmpobj->GetPC();
 		   *totalpc+=*pc;
 		   tmpobjstart++;
-	   }
-	   mSend->sendout(totalpc, mpCurrentKeyFrame->GetPoseRight()); 
+	}
+	if(totalpc->size()!=0)
+		mSend->sendout(totalpc, mpCurrentKeyFrame->GetPoseRight()); 
    }
 }
 

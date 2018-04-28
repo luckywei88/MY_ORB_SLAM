@@ -250,8 +250,8 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB1,const cv::Mat &imD1, const
 	}
 	if(mDepthMapFactor!=1 || imDepth.type()!=CV_32F)
 	{
-		imDepth.convertTo(imDepth,CV_32FC1,mDepthMapFactor,0);
-		//	imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
+		//imDepth.convertTo(imDepth,CV_32FC1,mDepthMapFactor,0);
+		imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
 	}
 	mCurrentFrame = Frame(imRGB,mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 	Track();

@@ -66,6 +66,7 @@ namespace ORB_SLAM2
 
 	Eigen::Matrix4f* pt;
 	int abc;
+	unsigned int color[80];
 	//lock
     };
 }

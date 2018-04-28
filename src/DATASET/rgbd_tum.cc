@@ -119,7 +119,6 @@ int main(int argc, char **argv)
 
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
-	sleep(1);
     }
 
     // Stop all threads

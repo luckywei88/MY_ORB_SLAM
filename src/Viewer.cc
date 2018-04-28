@@ -114,7 +114,7 @@ void Viewer::Run()
     pangolin::OpenGlMatrix Twc;
     Twc.SetIdentity();
 	cout<<"show"<<endl;
-    cv::namedWindow("ORB-SLAM2: Current Frame");
+ //   cv::namedWindow("ORB-SLAM2: Current Frame");
 
     bool bFollow = true;
     bool bLocalizationMode = false;
@@ -170,9 +170,9 @@ void Viewer::Run()
 	if(mpKeyFrameDrawer!=NULL)
 	{
         	cv::Mat imKey = mpKeyFrameDrawer->DrawKeyFrame();
-		cv::imshow("ORB-SLAM2: Current KeyFrame ",imKey);
+//		cv::imshow("ORB-SLAM2: Current KeyFrame ",imKey);
 	}
-        cv::imshow("ORB-SLAM2: Current Frame",im);
+//        cv::imshow("ORB-SLAM2: Current Frame",im);
         cv::waitKey(mT);
 
 

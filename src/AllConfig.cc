@@ -43,6 +43,8 @@ namespace ORB_SLAM2
 	n_private.param("ros",enable_ros,enable_ros);
 	n_private.param("use_gui",gui,gui);
 	n_private.param("type",type,type);
+	
+	cout<<"config "<<config<<endl;
     }
 
     void AllConfig::setCon(char **argv)
