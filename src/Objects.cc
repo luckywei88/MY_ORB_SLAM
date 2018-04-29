@@ -20,7 +20,7 @@ namespace ORB_SLAM2
 				0.5);
 		//    cpf=new CPF();  0.35
 		vg=new pcl::VoxelGrid<PointT>();
-		vg->setLeafSize(0.005,0.005,0.005);
+		vg->setLeafSize(0.01,0.01,0.01);
 
                 sor=new pcl::StatisticalOutlierRemoval<PointT>();
 		sor->setMeanK(50);
@@ -222,8 +222,8 @@ namespace ORB_SLAM2
 						}
 					}
 
-					//vg->setInputCloud(cloud1);
-					//vg->filter(*cloud1);
+					vg->setInputCloud(cloud1);
+					vg->filter(*cloud1);
 					//sor->setInputCloud(cloud1);
 					//sor->filter(*cloud1);
 

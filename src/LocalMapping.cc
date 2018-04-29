@@ -102,7 +102,7 @@ void LocalMapping::DetectAndCombine()
     set<Object*>::iterator ObjsEnd=NearObjs.end();
 
     //compute ICP
-    objs->computeICP(mpCurrentKeyFrame,NearObjs);
+    //objs->computeICP(mpCurrentKeyFrame,NearObjs);
 
     //combine OBjects
     int n=objs->classes;
