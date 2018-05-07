@@ -20,7 +20,7 @@ namespace ORB_SLAM2
 				0.5);
 		//    cpf=new CPF();  0.35
 		vg=new pcl::VoxelGrid<PointT>();
-		vg->setLeafSize(0.01,0.01,0.01);
+		vg->setLeafSize(0.03,0.03,0.03);
 
                 sor=new pcl::StatisticalOutlierRemoval<PointT>();
 		sor->setMeanK(50);
@@ -142,7 +142,7 @@ namespace ORB_SLAM2
 				unsigned char r=(unsigned char)color[0];
 				unsigned char g=(unsigned char)color[1];
 				unsigned char b=(unsigned char)color[2];
-				unsigned int col=(r<<16)|(g<<8)|b;
+				unsigned int col=(b<<16)|(g<<8)|r;
 				pt.rgb=*reinterpret_cast<float*>(&col);
 
 				if(z<0)
